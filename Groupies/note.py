@@ -20,8 +20,8 @@ class NoteSegment(LineSegment, Note):
 
         # 初始化音乐属性
         midi_value = 1500-int(self.y / 2 + 30)
-        timing =int(self.left_x / 20.0)
         quarter_length = (self.right_x - self.left_x) / 160.0
+        self.timing=int(self.left_x/20.0)
 
         Note.__init__(
             self,
@@ -76,7 +76,7 @@ class NoteDrawWidget(LineDrawWidget):
             # 打印当前乐谱
             print("当前乐谱:")
             for note in self.notes:
-                print(f"{note.name} {note.duration.type}{note.timing}", end=" | ")
+                print(f"{note.name} {note.duration.type} {note.timing}", end=" | ")
             print("\n" + "-" * 50)
 
 
