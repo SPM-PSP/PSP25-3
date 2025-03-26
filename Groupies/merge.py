@@ -45,23 +45,32 @@ class SegmentStructure:
 
         # 生成结果
         result = []
+        rest=[]
         for i in range(m):
             s, e = intervals[i]
             sorted_heights = sorted(heights[i])
-            result.append((s, e, sorted_heights))
-        return result
+            if len(sorted_heights) > 0:
+                result.append((s, e, sorted_heights))
+            else:
+                rest.append((s, e))
+        return result, rest
 
 
 # 示例用法
 if __name__ == "__main__":
     # 创建结构并添加线段
     structure = SegmentStructure()
+    structure.add_segment(20, 23, 4)
     structure.add_segment(1, 3, 2)
     structure.add_segment(2, 5, 3)
     structure.add_segment(3, 7, 4)
     structure.add_segment(4, 9, 5)
+    structure.add_segment(10,15,7)
+
 
     # 计算结果
-    result = structure.compute_result()
+    result, rest= structure.compute_result()
     for interval in result:
         print(f"Start: {interval[0]}, End: {interval[1]}, Heights: {interval[2]}")
+    for seg in rest:
+        print(f"Start: {seg[0]}, End: {seg[1]}")

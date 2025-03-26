@@ -12,7 +12,7 @@ def convert_notes_to_stream(Notelist):
     for noteelement in Notelist:
         #print(noteelement.left_x,noteelement.right_x,noteelement.y)
         structure.add_segment(noteelement.left_x,  noteelement.right_x , 105-noteelement.y/20)
-    result = structure.compute_result()
+    result, rest = structure.compute_result()
     for element in result:
         if len(element[2])==1:
             note1=note.Note(pitch=element[2][0],quarterLength=(element[1]-element[0])/160.0)
@@ -23,6 +23,8 @@ def convert_notes_to_stream(Notelist):
                 c_major.add(note.Note(pitch=element[2][i]))
             c_major.quarterLength = (element[1]-element[0])/160.0
             s.insert(element[0]/160.0, c_major)
+    for element in rest:
+        s.insert(element[0]/160.0, note.Rest(quarterLength=(element[1]-element[0])/160.0))
     return s
 
 if __name__ == "__main__":
