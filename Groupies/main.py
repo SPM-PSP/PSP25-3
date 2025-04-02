@@ -1,5 +1,6 @@
-from draw import LineSegment
-from draw import LineDrawWidget
+from draw import *
+from stream import convert_notes_to_stream
+from note import *
 
 import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
@@ -30,12 +31,12 @@ class MainWindow(QMainWindow):
         self.project_name = QLineEdit()
         project_layout.addWidget(self.project_name)
 
-        self.btn_new = QPushButton("新建项目")
-        self.btn_new.clicked.connect(self.new_project)
+        self.btn_new = QPushButton("显示乐谱")
+        self.btn_new.clicked.connect(self.open_xml)
         project_layout.addWidget(self.btn_new)
 
         # 绘图滚动区
-        self.draw_area = LineDrawWidget()
+        self.draw_area = NoteDrawWidget()
         scroll = QScrollArea()
         scroll.setWidget(self.draw_area)
         scroll.setWidgetResizable(True)
@@ -69,6 +70,7 @@ class MainWindow(QMainWindow):
 
         # 文件菜单
         file_menu = menubar.addMenu("文件(&F)")
+        file_menu.addAction("新建").triggered.connect(self.new_project)
         file_menu.addAction("打开").triggered.connect(self.open_project)
         file_menu.addAction("保存").triggered.connect(self.save_project)
         file_menu.addSeparator()
@@ -94,6 +96,8 @@ class MainWindow(QMainWindow):
             self.log_area.append("项目已保存")
             self.statusBar().showMessage("保存成功", 2000)
 
+    def open_xml(self):
+        convert_notes_to_stream(self.draw_area.notes).show('musicxml')
     def show_about(self):
         self.log_area.append("音乐结构编辑器 v1.0\n支持钢琴卷帘编辑和音乐结构分析")
 
