@@ -1,7 +1,7 @@
 from draw import *
 from stream import convert_notes_to_stream
 from note import *
-
+from music21 import converter
 import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QLineEdit,
@@ -87,14 +87,27 @@ class MainWindow(QMainWindow):
         self.update()
 
     def open_project(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "打开项目", "", "项目文件 (*.proj)")
+        filename, _ = QFileDialog.getOpenFileName(self, "打开项目", "", "项目文件 (*.xml)")
         if filename:
+            score = converter.parse(filename)
+            score.show('musicxml')
             self.log_area.append(f"已打开项目: {filename}")
 
     def save_project(self):
-        if self.project_name.text():
-            self.log_area.append("项目已保存")
-            self.statusBar().showMessage("保存成功", 2000)
+        # 检查是否存在可保存的乐谱对象
+        if not hasattr(self, 'current_score') or self.current_score is None:
+            self.log_area.append("错误：没有可保存的乐谱内容")
+            return
+        # 获取保存路径
+        filename, _ = QFileDialog.getSaveFileName(
+            self,
+            "保存项目",
+            "",  # 初始路径
+            "项目文件 (*.xml)",  # 文件过滤器
+            options=QFileDialog.Options()
+        )
+        if not filename:
+            return  # 用户取消保存
 
     def open_xml(self):
         convert_notes_to_stream(self.draw_area.notes).show('musicxml')
