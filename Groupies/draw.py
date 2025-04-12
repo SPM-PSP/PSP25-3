@@ -119,6 +119,7 @@ class LineDrawWidget(QWidget):
                 print(i.left_x,i.right_x,i.y,end='   ')
             print(end='\n')
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
