@@ -1,5 +1,6 @@
 from draw import *
 from stream import convert_notes_to_stream
+from stream import save_musicxml, auto_save_musicxml
 from note import *
 
 import sys
@@ -92,14 +93,18 @@ class MainWindow(QMainWindow):
             self.log_area.append(f"已打开项目: {filename}")
 
     def save_project(self):
+        save_musicxml(self.draw_area.notes)
         if self.project_name.text():
             self.log_area.append("项目已保存")
             self.statusBar().showMessage("保存成功", 2000)
 
     def open_xml(self):
-        convert_notes_to_stream(self.draw_area.notes).show('musicxml')
+        convert_notes_to_stream(self.draw_area.notes)
+        auto_save_musicxml(self.draw_area.notes)
+
     def show_about(self):
         self.log_area.append("音乐结构编辑器 v1.0\n支持钢琴卷帘编辑和音乐结构分析")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
