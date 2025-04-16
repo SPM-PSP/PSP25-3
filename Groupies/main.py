@@ -3,7 +3,12 @@ from stream import convert_notes_to_stream
 from stream import save_musicxml, auto_save_musicxml
 from note import *
 
+import pygame
+import tempfile
+from datetime import datetime
+
 import sys
+import os
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QLineEdit,
                              QTextEdit, QStatusBar, QFileDialog, QAction, qApp,
@@ -16,6 +21,8 @@ class MainWindow(QMainWindow):
         self.initUI()
         self.setWindowTitle("音乐结构编辑器")
         self.resize(1200, 800)
+        self.current_midi = None  # 用于跟踪当前播放的MIDI文件
+        pygame.mixer.init()  # 初始化音频系统
 
     def initUI(self):
         # 主界面布局
@@ -35,6 +42,10 @@ class MainWindow(QMainWindow):
         self.btn_new = QPushButton("显示乐谱")
         self.btn_new.clicked.connect(self.open_xml)
         project_layout.addWidget(self.btn_new)
+
+        self.btn_play = QPushButton("播放乐谱", self)
+        self.btn_play.clicked.connect(self.play_music)
+        project_layout.addWidget(self.btn_play)
 
         # 绘图滚动区
         self.draw_area = NoteDrawWidget()
@@ -105,6 +116,39 @@ class MainWindow(QMainWindow):
     def show_about(self):
         self.log_area.append("音乐结构编辑器 v1.0\n支持钢琴卷帘编辑和音乐结构分析")
 
+    def play_music(self):
+        """播放当前编辑的乐谱"""
+        try:
+            # 停止当前播放
+            if pygame.mixer.music.get_busy():
+                pygame.mixer.music.stop()
+
+            # 生成临时MIDI文件
+            score_stream = convert_notes_to_stream(self.draw_area.notes)
+            with tempfile.NamedTemporaryFile(suffix='.mid', delete=False) as midi_file:
+                self.current_midi = midi_file.name
+                score_stream.write('midi', self.current_midi)
+
+            # 加载并播放
+            pygame.mixer.music.load(self.current_midi)
+            pygame.mixer.music.play()
+
+            # 更新状态
+            self.statusBar().showMessage("正在播放...", 2000)
+            self.log_area.append(f"{datetime.now().strftime('%H:%M:%S')} 开始播放")
+
+        except Exception as e:
+            self.statusBar().showMessage(f"播放失败: {str(e)}", 5000)
+            self.log_area.append(f"播放错误: {str(e)}")
+
+        # 修改退出方法确保清理资源
+
+    def closeEvent(self, event):
+        if pygame.mixer.get_init():
+            pygame.mixer.quit()
+        if self.current_midi and os.path.exists(self.current_midi):
+            os.remove(self.current_midi)
+        event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
