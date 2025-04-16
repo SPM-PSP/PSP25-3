@@ -2,6 +2,10 @@ from draw import *
 from stream import convert_notes_to_stream
 from stream import save_musicxml, auto_save_musicxml
 from note import *
+from pathlib import Path
+
+target_dir = Path(__file__).parent.resolve()/ "converters"
+sys.path.append(str(target_dir))
 
 import pygame
 import tempfile
@@ -15,6 +19,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QScrollArea, QScrollBar)
 from PyQt5.QtGui import QIcon, QColor, QPainter, QPen, QFont
 from PyQt5.QtCore import Qt, QPointF
+from mxl2opt import mxl2opt
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -49,16 +54,21 @@ class MainWindow(QMainWindow):
 
         # 绘图滚动区
         self.draw_area = NoteDrawWidget()
-        scroll = QScrollArea()
-        scroll.setWidget(self.draw_area)
-        scroll.setWidgetResizable(True)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.draw_area.setFixedSize(3000, 2000)  # 🚩设置实际区域大小
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(self.draw_area)
+
+        scroll_area.setWidgetResizable(False)  # 🚩不要自适应，否则滚动条不会出现
+
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setAlignment(Qt.AlignLeft | Qt.AlignTop)  # 🚩左上对齐更直观
 
         # 组合左侧布局
         left_panel.addLayout(project_layout)
         left_panel.addWidget(QLabel("音乐结构编辑区:"))
-        left_panel.addWidget(scroll)
+        left_panel.addWidget(scroll_area)
 
         # 右侧日志面板
         right_panel = QVBoxLayout()
