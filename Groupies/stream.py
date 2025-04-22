@@ -80,7 +80,7 @@ def auto_save_musicxml(notes):
     for old_file in files[10:]:
         os.remove(os.path.join(save_dir, old_file))
 
-    return filepath
+    return filename
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

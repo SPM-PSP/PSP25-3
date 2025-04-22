@@ -31,4 +31,4 @@ def mxl2opt(filename, isPDF = True):
     except Exception as e:
         print(f"{str(e)}")
 
-mxl2opt("tmp_20250412220522.mxl")
+    return opt_path
