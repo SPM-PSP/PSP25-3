@@ -1,4 +1,3 @@
-# stream.py
 from music21 import *
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 from PyQt5.QtGui import QPainter
@@ -9,7 +8,6 @@ import sys
 import os
 from merge import SegmentStructure
 from datetime import datetime
-
 def convert_notes_to_stream(Notelist):
     s=stream.Stream()
     structure=SegmentStructure()
@@ -30,7 +28,6 @@ def convert_notes_to_stream(Notelist):
     for element in rest:
         s.insert(element[0]/160.0, note.Rest(quarterLength=(element[1]-element[0])/160.0))
     return s
-
 
 def save_musicxml(notes):
     """保存为MusicXML文件"""
@@ -80,21 +77,14 @@ def auto_save_musicxml(notes):
     for old_file in files[10:]:
         os.remove(os.path.join(save_dir, old_file))
 
-    return filename
+    return filepath
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     btn_export = QPushButton("导出乐谱", window)
-
-    #显示乐谱
-    # btn_export.clicked.connect(lambda:
-    #                            convert_notes_to_stream(window.canvas.notes).show('musicxml')
-    #                            )
-
-    #保存乐谱
     btn_export.clicked.connect(lambda:
-                               save_musicxml(window.canvas.notes)  # 替换原来的直接显示
+                               convert_notes_to_stream(window.canvas.notes).show('musicxml')
                                )
     window.show()
     sys.exit(app.exec_())
