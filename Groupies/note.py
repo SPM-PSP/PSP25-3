@@ -1,57 +1,16 @@
 from draw import *
 from music21.note import Note
-from music21 import pitch, duration
+from music21 import pitch, duration, tempo
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt
 import pygame
+import tempfile
 import numpy as np
-
-class AudioEngine:  # 新增音频引擎类
-    def __init__(self, bpm=60):
-        pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=2048)
-        self.bpm = bpm
-
-    def get_note_properties(self, note_segment):
-        """从NoteSegment获取音频属性"""
-        try:
-            # 直接从music21对象获取频率
-            frequency = note_segment.pitch.frequency
-        except:
-            frequency = 440.0
-
-        try:
-            # 计算时值（秒）
-            mt = pygame.tempo.MetronomeMark(number=self.bpm)
-            seconds = note_segment.duration.quarterLength * mt.secondsPerQuarter()
-        except:
-            seconds = 1.0
-
-        return frequency, seconds
-
-    def play_note(self, note_segment):
-        """生成并播放音符"""
-        freq, secs = self.get_note_properties(note_segment)
-
-        # 生成音频数据
-        sample_rate = 44100
-        t = np.linspace(0, secs, int(sample_rate * secs), False)
-        wave = np.sin(2 * np.pi * freq * t)
-
-        # 添加淡出效果
-        fade_samples = int(sample_rate * 0.05)
-        wave[-fade_samples:] *= np.linspace(1, 0, fade_samples)
-
-        # 转换音频格式
-        audio = (wave * 32767).astype(np.int16)
-        stereo_audio = np.repeat(audio.reshape(-1, 1), 2, axis=1)
-        sound = pygame.sndarray.make_sound(stereo_audio)
-
-        # 播放声音
-        channel = pygame.mixer.find_channel()
-        if channel:
-            channel.play(sound)
+from scipy.signal import butter, lfilter
+from stream import *
+import copy
 
 class NoteSegment(LineSegment, Note):
     def __init__(self, line_inst):
@@ -75,16 +34,48 @@ class NoteSegment(LineSegment, Note):
             duration=duration.Duration(quarterLength=quarter_length)
         )
 
+        pygame.mixer.init()
+
 
 class NoteDrawWidget(LineDrawWidget):
     def __init__(self):
         super().__init__()  # 使用super()正确初始化父类
         self.notes = []
+        self.main_window = None
 
     def draw_grid(self, painter):
         super().draw_grid(painter)
         painter.setPen(Qt.red)
         painter.drawLine(0, 900, self.width(), 900)
+
+    def play_a_music(self, notes):
+        """播放给定的音符列表"""
+        try:
+            if pygame.mixer.music.get_busy():
+                pygame.mixer.music.stop()
+
+            # 转换音符为流并生成MIDI
+            from stream import convert_notes_to_stream
+            score_stream = convert_notes_to_stream(notes)
+            with tempfile.NamedTemporaryFile(suffix='.mid', delete=False) as midi_file:
+                current_midi = midi_file.name
+                score_stream.write('midi', current_midi)
+
+            # 加载并播放MIDI
+            pygame.mixer.music.load(current_midi)
+            pygame.mixer.music.play()
+
+            # 更新状态栏
+            if self.main_window:
+                self.main_window.statusBar().showMessage("播放中...", 2000)
+
+        except Exception as e:
+            error_msg = f"播放失败: {str(e)}"
+            if self.main_window:
+                self.main_window.statusBar().showMessage(error_msg, 5000)
+            else:
+                print(error_msg)
+
 
     def mousePressEvent(self, event):
         pos = event.pos()
@@ -114,10 +105,20 @@ class NoteDrawWidget(LineDrawWidget):
                 self.temp_line.right_x = self.temp_line.left_x + 10
 
             self.lines.append(self.temp_line)
-            try:
-                self.notes.append(NoteSegment(self.temp_line))
-            except Exception as e:
-                print(f"创建Note失败: {str(e)}")
+            cur_note = NoteSegment(self.temp_line)
+            self.notes.append(cur_note)
+
+            tmp_line = copy.copy(self.temp_line)
+
+            tmp_line.right_x -= tmp_line.left_x
+            tmp_line.left_x = 0
+            temp_note = NoteSegment(tmp_line)
+
+            # print("Python Path:", sys.path)
+
+            self.play_a_music([temp_note])
+
+
             self.temp_line = None
             self.update()
 

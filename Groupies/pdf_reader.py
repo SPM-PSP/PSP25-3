@@ -25,7 +25,7 @@ class PDFViewer(QWidget):
         self.pdf_label = QLabel()
         self.pdf_label.setAlignment(Qt.AlignCenter)
         self.pdf_label.setMinimumSize(200, 150)
-        layout.addWidget(self.pdf_label)
+        layout.addWidget(self.pdf_label,1)
 
         # 控制栏
         controls = QHBoxLayout()

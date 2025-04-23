@@ -15,12 +15,14 @@ class LineSegment:
         self.color = color  # 颜色(QColor对象)
 
     def contains_point(self, point: QPointF, threshold=5):
-        """判断点是否在线段附近"""
-        # 判断y坐标是否在阈值范围内
-        if abs(point.y() - self.y) > threshold:
-            return False
-        # 判断x坐标是否在线段范围内
-        return self.left_x - threshold <= point.x() <= self.right_x + threshold
+        """判断点是否在矩形范围内"""
+        rect = QRectF(
+            self.left_x,  # 左上角x坐标
+            self.y - 20,  # 左上角y坐标
+            self.right_x - self.left_x,  # 宽度
+            20  # 高度
+        )
+        return rect.contains(point)
 
 
 class LineDrawWidget(QWidget):

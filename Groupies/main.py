@@ -1,6 +1,5 @@
 from draw import *
-from stream import convert_notes_to_stream
-from stream import save_musicxml, auto_save_musicxml
+from stream import *
 from note import *
 from pathlib import Path
 import pygame
@@ -19,7 +18,6 @@ target_dir = Path(__file__).parent.resolve() / "converters"
 sys.path.append(str(target_dir))
 from mxl2opt import mxl2opt
 from pdf_reader import PDFViewer
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -55,6 +53,7 @@ class MainWindow(QMainWindow):
 
         # 绘图滚动区
         self.draw_area = NoteDrawWidget()
+        self.draw_area.main_window = self
         self.draw_area.setFixedSize(3000, 2000)
         scroll_area = QScrollArea()
         scroll_area.setWidget(self.draw_area)
@@ -159,6 +158,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    # print("Python Path:", sys.path)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
