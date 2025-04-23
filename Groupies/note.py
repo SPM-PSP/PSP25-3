@@ -5,7 +5,54 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt
+import pygame
+import numpy as np
 
+
+class AudioEngine:  # 新增音频引擎类
+    def __init__(self, bpm=60):
+        pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=2048)
+        self.bpm = bpm
+
+    def get_note_properties(self, note_segment):
+        """从NoteSegment获取音频属性"""
+        try:
+            # 直接从music21对象获取频率
+            frequency = note_segment.pitch.frequency
+        except:
+            frequency = 440.0
+
+        try:
+            # 计算时值（秒）
+            mt = pygame.tempo.MetronomeMark(number=self.bpm)
+            seconds = note_segment.duration.quarterLength * mt.secondsPerQuarter()
+        except:
+            seconds = 1.0
+
+        return frequency, seconds
+
+    def play_note(self, note_segment):
+        """生成并播放音符"""
+        freq, secs = self.get_note_properties(note_segment)
+
+        # 生成音频数据
+        sample_rate = 44100
+        t = np.linspace(0, secs, int(sample_rate * secs), False)
+        wave = np.sin(2 * np.pi * freq * t)
+
+        # 添加淡出效果
+        fade_samples = int(sample_rate * 0.05)
+        wave[-fade_samples:] *= np.linspace(1, 0, fade_samples)
+
+        # 转换音频格式
+        audio = (wave * 32767).astype(np.int16)
+        stereo_audio = np.repeat(audio.reshape(-1, 1), 2, axis=1)
+        sound = pygame.sndarray.make_sound(stereo_audio)
+
+        # 播放声音
+        channel = pygame.mixer.find_channel()
+        if channel:
+            channel.play(sound)
 
 class NoteSegment(LineSegment, Note):
     def __init__(self, line_inst):
@@ -41,13 +88,15 @@ class NoteDrawWidget(LineDrawWidget):
         painter.drawLine(0, 900, self.width(), 900)
 
     def mousePressEvent(self, event):
-        pos = self.snap_to_grid(event.pos())
+        pos = event.pos()
 
         if event.button() == Qt.LeftButton:
+            # 开始创建新线段
             self.temp_line = LineSegment(
-                left_x=pos.x(),
-                right_x=pos.x(),
-                y=pos.y(),
+                left_x=round(pos.x() / self.grid_size) * self.grid_size,
+                right_x=round(pos.x() / self.grid_size) * self.grid_size,  # 初始长度为0
+                y=round(pos.y() / self.grid_size) * self.grid_size if pos.y() % 20 > 10 else round(
+                    pos.y() / self.grid_size) * self.grid_size + 20,
                 color=self.current_color
             )
         elif event.button() == Qt.RightButton:
@@ -67,7 +116,8 @@ class NoteDrawWidget(LineDrawWidget):
 
             self.lines.append(self.temp_line)
             try:
-                self.notes.append(NoteSegment(self.temp_line))
+                notes=NoteSegment(self.temp_line)
+                self.notes.append(notes)
             except Exception as e:
                 print(f"创建Note失败: {str(e)}")
             self.temp_line = None

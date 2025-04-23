@@ -1,8 +1,9 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtCore import Qt, QPointF, QRectF
-from PyQt5.QtGui import QPainter, QColor, QPen
+from PyQt5.QtGui import QPainter, QColor, QPen, QBrush
 import music21
+import pygame
 
 
 class LineSegment:
@@ -16,11 +17,8 @@ class LineSegment:
 
     def contains_point(self, point: QPointF, threshold=5):
         """判断点是否在线段附近"""
-        # 判断y坐标是否在阈值范围内
-        if abs(point.y() - self.y) > threshold:
-            return False
         # 判断x坐标是否在线段范围内
-        return self.left_x - threshold <= point.x() <= self.right_x + threshold
+        return (self.left_x <= point.x() <= self.right_x) and ( self.y -20  <= point.y() <= self.y )
 
 
 class LineDrawWidget(QWidget):
@@ -29,7 +27,7 @@ class LineDrawWidget(QWidget):
         self.lines = []  # 存储所有线段
         self.temp_line = None  # 临时线段（绘制中）
         self.grid_size = 20  # 网格大小（像素）
-        self.current_color = QColor(0, 0, 255)  # 默认蓝色
+        self.current_color = QColor(173,216,230)  # 默认蓝色
 
         self.setMouseTracking(True)
         self.setMinimumSize(800, 600)
@@ -62,12 +60,22 @@ class LineDrawWidget(QWidget):
             painter.drawLine(x, 0, x, self.height())
 
     def draw_line(self, painter, line):
-        """绘制单个线段"""
-        painter.setPen(QPen(line.color, 3))
-        painter.drawLine(
-            QPointF(line.left_x, line.y),
-            QPointF(line.right_x, line.y)
+        """绘制圆角矩形，带有2像素白色边框"""
+        # 设置白色边框，2像素宽度
+        painter.setPen(QPen(Qt.white, 2))
+        # 设置填充颜色
+        painter.setBrush(QBrush(line.color))
+
+        # 创建矩形区域（与原始矩形相同）
+        rect = QRectF(
+            line.left_x,  # 左上角x坐标
+            line.y - 20,  # 左上角y坐标
+            line.right_x - line.left_x,  # 宽度
+            20  # 高度
         )
+
+        # 绘制圆角矩形，圆角半径为5像素
+        painter.drawRoundedRect(rect, 5, 5)
 
     def snap_to_grid(self, pos: QPointF):
         """坐标对齐到网格"""
@@ -76,17 +84,17 @@ class LineDrawWidget(QWidget):
         return QPointF(x, y)
 
     def mousePressEvent(self, event):
-        pos = self.snap_to_grid(event.pos())
+        pos = event.pos()
 
         if event.button() == Qt.LeftButton:
             # 开始创建新线段
             self.temp_line = LineSegment(
-                left_x=pos.x(),
-                right_x=pos.x(),  # 初始长度为0
-                y=pos.y(),
+                left_x=round(pos.x()/self.grid_size)*self.grid_size,
+                right_x=round(pos.x()/self.grid_size)*self.grid_size,  # 初始长度为0
+                y=round(pos.y()/self.grid_size)*self.grid_size if pos.y() % 20>10 else round(pos.y()/self.grid_size)*self.grid_size + 20,
                 color=self.current_color
             )
-
+            print(pos.y()%20)
         elif event.button() == Qt.RightButton:
             # 查找并删除线段
             for line in self.lines[::-1]:  # 从后往前遍历
