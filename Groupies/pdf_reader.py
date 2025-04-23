@@ -100,7 +100,7 @@ class PDFViewer(QWidget):
 
 if __name__ == '__main__':
     # 在此处指定你的PDF文件路径
-    pdf_path = "C:/Users/Goat/Documents/GitHub/PSP25-3/Groupies/tmp_works/tmp_20250416181123.pdf"  # 替换为你的实际路径
+    pdf_path = "C:/Users/Goat/Documents/GitHub/PSP25-3/Groupies/tmp_works/tmp_20250422161246.pdf"  # 替换为你的实际路径
 
     app = QApplication(sys.argv)
     viewer = PDFViewer(pdf_path)

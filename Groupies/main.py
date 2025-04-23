@@ -76,18 +76,6 @@ class MainWindow(QMainWindow):
         self.pdf_scroll.setWidgetResizable(True)
         right_panel.addWidget(self.pdf_scroll,1)
 
-        control_box = QHBoxLayout()
-        self.prev_btn = QPushButton("上一页")
-        self.next_btn = QPushButton("下一页")
-        self.page_label = QLabel("第 0 页 / 共 0 页")
-
-        control_box.addWidget(self.prev_btn)
-        control_box.addWidget(self.next_btn)
-        control_box.addWidget(self.page_label)
-        control_box.addStretch(1)
-
-        right_panel.addLayout(control_box)
-
         # 设置主布局比例
         main_layout.addLayout(left_panel, stretch=1)
         main_layout.addLayout(right_panel, stretch=1)
