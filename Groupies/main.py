@@ -13,11 +13,10 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PyQt5.QtGui import QIcon, QColor, QPainter, QPen, QFont, QPixmap, QImage
 from PyQt5.QtCore import Qt, QPointF, QSize
 import fitz
-
-target_dir = Path(__file__).parent.resolve() / "converters"
-sys.path.append(str(target_dir))
-from mxl2opt import mxl2opt
 from pdf_reader import PDFViewer
+
+project_root = Path(__file__).parent.resolve()
+sys.path.append(str(project_root))  # 添加项目根目录到路径
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -113,6 +112,7 @@ class MainWindow(QMainWindow):
         try:
             convert_notes_to_stream(self.draw_area.notes)
             tmp_xml = auto_save_musicxml(self.draw_area.notes)
+            from converters.mxl2opt import mxl2opt
             tmp_pdf = mxl2opt(tmp_xml)
 
             # 清理旧PDF部件
