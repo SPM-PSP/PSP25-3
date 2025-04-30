@@ -8,26 +8,33 @@ import sys
 import os
 from merge import SegmentStructure
 from datetime import datetime
-def convert_notes_to_stream(Notelist):
-    s=stream.Stream()
-    structure=SegmentStructure()
+from music21 import stream, note, chord, tempo
+from merge import SegmentStructure
+
+def convert_notes_to_stream(Notelist, bpm=120):
+    s = stream.Stream()
+    # 设置bpm
+    mm = tempo.MetronomeMark(number=bpm)
+    s.insert(0, mm)
+
+    structure = SegmentStructure()
     for noteelement in Notelist:
-        #print(noteelement.left_x,noteelement.right_x,noteelement.y)
-        structure.add_segment(noteelement.left_x,  noteelement.right_x , 105-noteelement.y/20)
+        structure.add_segment(noteelement.left_x,  noteelement.right_x , 109 - noteelement.y / 20)
     result, rest = structure.compute_result()
     for element in result:
-        if len(element[2])==1:
-            note1=note.Note(pitch=element[2][0],quarterLength=(element[1]-element[0])/160.0)
-            s.insert(element[0]/160.0, note1)
+        if len(element[2]) == 1:
+            note1 = note.Note(pitch=element[2][0], quarterLength=(element[1] - element[0]) / 160.0)
+            s.insert(element[0] / 160.0, note1)
         else:
-            c_major=chord.Chord()
+            c_major = chord.Chord()
             for i in range(len(element[2])):
                 c_major.add(note.Note(pitch=element[2][i]))
-            c_major.quarterLength = (element[1]-element[0])/160.0
-            s.insert(element[0]/160.0, c_major)
+            c_major.quarterLength = (element[1] - element[0]) / 160.0
+            s.insert(element[0] / 160.0, c_major)
     for element in rest:
-        s.insert(element[0]/160.0, note.Rest(quarterLength=(element[1]-element[0])/160.0))
+        s.insert(element[0] / 160.0, note.Rest(quarterLength=(element[1] - element[0]) / 160.0))
     return s
+
 
 def save_musicxml(notes):
     """保存为MusicXML文件"""
@@ -41,17 +48,17 @@ def save_musicxml(notes):
     if not filepath:  # 用户取消保存
         return
 
-        # 生成乐谱流
-        score_stream = convert_notes_to_stream(notes)
+    # 生成乐谱流
+    score_stream = convert_notes_to_stream(notes)
 
-        # 保存文件
-        score_stream.write('musicxml', fp=filepath)
+    # 保存文件
+    score_stream.write('musicxml', fp=filepath)
 
-        # 可选：提示保存成功
-        window.statusBar().showMessage(f"乐谱已保存至：{filepath}", 3000)
+    # 可选：提示保存成功
+    window.statusBar().showMessage(f"乐谱已保存至：{filepath}", 3000)
 
-        # 可选：自动打开文件
-        score_stream.show('musicxml')
+    # 可选：自动打开文件
+    score_stream.show('musicxml')
 
 
 def auto_save_musicxml(notes):

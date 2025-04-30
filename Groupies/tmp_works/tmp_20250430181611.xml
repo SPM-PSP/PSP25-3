@@ -16,12 +16,12 @@
     </scaling>
   </defaults>
   <part-list>
-    <score-part id="Pa3042cb6642504bbcf121787ac9ca18d">
+    <score-part id="P150ad980ac7370ab02ef3b2af7f83bc4">
       <part-name />
     </score-part>
   </part-list>
   <!--=========================== Part 1 ===========================-->
-  <part id="Pa3042cb6642504bbcf121787ac9ca18d">
+  <part id="P150ad980ac7370ab02ef3b2af7f83bc4">
     <!--========================= Measure 1 ==========================-->
     <measure implicit="no" number="1">
       <attributes>
@@ -35,72 +35,125 @@
           <line>2</line>
         </clef>
       </attributes>
+      <direction>
+        <direction-type>
+          <metronome parentheses="no">
+            <beat-unit>quarter</beat-unit>
+            <per-minute>120</per-minute>
+          </metronome>
+        </direction-type>
+        <sound tempo="120" />
+      </direction>
       <note print-object="no" print-spacing="yes">
         <rest />
-        <duration>5040</duration>
-        <type>eighth</type>
+        <duration>3780</duration>
+        <type>16th</type>
+        <dot />
       </note>
       <note>
         <pitch>
-          <step>B</step>
+          <step>C</step>
           <alter>0</alter>
-          <octave>5</octave>
+          <octave>4</octave>
         </pitch>
-        <duration>20160</duration>
+        <duration>10080</duration>
         <tie type="start" />
-        <type>half</type>
+        <type>quarter</type>
         <notations>
           <tied type="start" />
         </notations>
       </note>
       <note>
         <pitch>
-          <step>B</step>
+          <step>C</step>
           <alter>0</alter>
-          <octave>5</octave>
+          <octave>4</octave>
         </pitch>
-        <duration>5040</duration>
+        <duration>1260</duration>
         <tie type="stop" />
-        <type>eighth</type>
+        <type>32nd</type>
         <notations>
           <tied type="stop" />
         </notations>
       </note>
       <note>
+        <rest />
+        <duration>1260</duration>
+        <type>32nd</type>
+      </note>
+      <note>
         <pitch>
-          <step>F</step>
-          <alter>0</alter>
+          <step>C</step>
+          <alter>1</alter>
           <octave>4</octave>
         </pitch>
-        <duration>2520</duration>
+        <duration>3780</duration>
         <type>16th</type>
-        <stem>up</stem>
-        <beam number="1">begin</beam>
-        <beam number="2">forward hook</beam>
+        <dot />
+        <accidental>sharp</accidental>
       </note>
       <note>
-        <chord />
-        <pitch>
-          <step>B</step>
-          <alter>0</alter>
-          <octave>5</octave>
-        </pitch>
-        <duration>2520</duration>
-        <type>16th</type>
-        <accidental>natural</accidental>
+        <rest />
+        <duration>1260</duration>
+        <type>32nd</type>
       </note>
       <note>
         <pitch>
-          <step>F</step>
+          <step>C</step>
           <alter>0</alter>
           <octave>4</octave>
         </pitch>
         <duration>7560</duration>
-        <tie type="start" />
         <type>eighth</type>
         <dot />
-        <stem>up</stem>
-        <beam number="1">end</beam>
+        <accidental>natural</accidental>
+      </note>
+      <note>
+        <rest />
+        <duration>1260</duration>
+        <type>32nd</type>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <alter>0</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>5040</duration>
+        <tie type="start" />
+        <type>eighth</type>
+        <notations>
+          <tied type="start" />
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <alter>0</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>1260</duration>
+        <tie type="stop" />
+        <type>32nd</type>
+        <notations>
+          <tied type="stop" />
+        </notations>
+      </note>
+      <note>
+        <rest />
+        <duration>2520</duration>
+        <type>16th</type>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>1260</duration>
+        <tie type="start" />
+        <type>32nd</type>
+        <accidental>sharp</accidental>
         <notations>
           <tied type="start" />
         </notations>
@@ -110,14 +163,13 @@
     <measure implicit="no" number="2">
       <note>
         <pitch>
-          <step>F</step>
-          <alter>0</alter>
+          <step>C</step>
+          <alter>1</alter>
           <octave>4</octave>
         </pitch>
-        <duration>17640</duration>
+        <duration>7560</duration>
         <tie type="stop" />
-        <type>quarter</type>
-        <dot />
+        <type>eighth</type>
         <dot />
         <notations>
           <tied type="stop" />

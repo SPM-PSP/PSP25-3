@@ -6,12 +6,13 @@ import pygame
 import tempfile
 import sys
 import os
+from piano import *
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QLineEdit,
                              QTextEdit, QStatusBar, QFileDialog, QAction, qApp,
-                             QScrollArea, QMessageBox)
+                             QScrollArea, QMessageBox, QInputDialog)
 from PyQt5.QtGui import QIcon, QColor, QPainter, QPen, QFont, QPixmap, QImage
-from PyQt5.QtCore import Qt, QPointF, QSize
+from PyQt5.QtCore import Qt, QPointF, QSize, QTimer
 import fitz
 from pdf_reader import PDFViewer
 
@@ -26,6 +27,10 @@ class MainWindow(QMainWindow):
         self.resize(1200, 800)
         self.current_midi = None
         self.pdf_viewer = None  # PDF查看器实例
+        self.is_playing = False
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_play_time)
+        self.bpm = 120  # 默认bpm为120
         pygame.mixer.init()
 
     def initUI(self):
@@ -34,20 +39,42 @@ class MainWindow(QMainWindow):
         main_layout = QVBoxLayout(main_widget)
 
         # 上方面板
-        top_panel = QVBoxLayout()
-
-        # 绘图滚动区
         self.draw_area = NoteDrawWidget()
         self.draw_area.main_window = self
-        self.draw_area.setFixedSize(3000, 2000)
+        self.draw_area.setFixedSize(3000, 1760)
         scroll_area = QScrollArea()
         scroll_area.setWidget(self.draw_area)
         scroll_area.setWidgetResizable(False)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
-        # 添加上方组件
+        top_panel = QVBoxLayout()
         top_panel.addWidget(QLabel("音乐结构编辑区:"))
+
+        # 创建实际绘图区域
+        self.draw_area = NoteDrawWidget()
+        self.draw_area.setFixedSize(3000, 1760)
+        self.draw_area.main_window = self
+
+        # 创建钢琴键区域
+        self.piano_widget = PianoWidget(height=1760)
+
+        # 创建编辑区容器（包含钢琴键 + 绘图）
+        editor_container = QWidget()
+        editor_layout = QHBoxLayout(editor_container)
+        editor_layout.setContentsMargins(0, 0, 0, 0)
+        editor_layout.setSpacing(0)
+        editor_layout.addWidget(self.piano_widget)
+        editor_layout.addWidget(self.draw_area)
+
+        # 将容器加入 scroll_area，实现联动滚动
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(editor_container)
+        scroll_area.setWidgetResizable(False)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        top_panel.addLayout(QVBoxLayout())
         top_panel.addWidget(scroll_area)
 
         # 下方PDF面板
@@ -79,12 +106,30 @@ class MainWindow(QMainWindow):
         self.btn_play.triggered.connect(self.play_music)
         menubar.addAction(self.btn_play)
 
+        # 添加暂停按钮到菜单栏
+        self.btn_pause = QAction("暂停", self)
+        self.btn_pause.triggered.connect(self.pause_music)
+        menubar.addAction(self.btn_pause)
+        self.btn_pause.setEnabled(False)
+
+        # 添加继续按钮到菜单栏
+        self.btn_resume = QAction("继续", self)
+        self.btn_resume.triggered.connect(self.resume_music)
+        menubar.addAction(self.btn_resume)
+        self.btn_resume.setEnabled(False)
+
         file_menu = menubar.addMenu("文件(&F)")
         file_menu.addAction("新建").triggered.connect(self.new_project)
         file_menu.addAction("打开").triggered.connect(self.open_project)
         file_menu.addAction("保存").triggered.connect(self.save_project)
         file_menu.addSeparator()
         file_menu.addAction("退出").triggered.connect(self.close)
+
+        # 添加设置模块
+        settings_menu = menubar.addMenu("设置(&S)")
+        set_bpm_action = QAction("设置BPM", self)
+        set_bpm_action.triggered.connect(self.set_bpm)
+        settings_menu.addAction(set_bpm_action)
 
         help_menu = menubar.addMenu("帮助(&H)")
         help_menu.addAction("关于").triggered.connect(self.show_about)
@@ -105,7 +150,7 @@ class MainWindow(QMainWindow):
 
     def open_xml(self):
         try:
-            convert_notes_to_stream(self.draw_area.notes)
+            convert_notes_to_stream(self.draw_area.notes, self.bpm)
             tmp_xml = auto_save_musicxml(self.draw_area.notes)
             from converters.mxl2opt import mxl2opt
             tmp_pdf = mxl2opt(tmp_xml)
@@ -130,18 +175,60 @@ class MainWindow(QMainWindow):
         try:
             if pygame.mixer.music.get_busy():
                 pygame.mixer.music.stop()
+                self.timer.stop()
+                self.is_playing = False
+                self.btn_play.setText("播放乐谱")
+                self.btn_pause.setEnabled(False)
+                self.btn_resume.setEnabled(False)
+                self.statusBar().showMessage("播放已停止", 2000)
+                return
 
-            score_stream = convert_notes_to_stream(self.draw_area.notes)
+            score_stream = convert_notes_to_stream(self.draw_area.notes, self.bpm)
             with tempfile.NamedTemporaryFile(suffix='.mid', delete=False) as midi_file:
                 self.current_midi = midi_file.name
                 score_stream.write('midi', self.current_midi)
 
             pygame.mixer.music.load(self.current_midi)
             pygame.mixer.music.play()
+            self.is_playing = True
+            self.btn_play.setText("停止播放")
+            self.btn_pause.setEnabled(True)
+            self.btn_resume.setEnabled(False)
+            self.timer.start(100)  # 每100毫秒更新一次时间
             self.statusBar().showMessage("正在播放... 按播放键可停止", 2000)
 
         except Exception as e:
             self.statusBar().showMessage(f"播放失败: {str(e)}", 5000)
+
+    def pause_music(self):
+        if self.is_playing:
+            pygame.mixer.music.pause()
+            self.is_playing = False
+            self.btn_pause.setEnabled(False)
+            self.btn_resume.setEnabled(True)
+            self.timer.stop()
+            self.statusBar().showMessage("播放已暂停", 2000)
+
+    def resume_music(self):
+        if not self.is_playing:
+            pygame.mixer.music.unpause()
+            self.is_playing = True
+            self.btn_pause.setEnabled(True)
+            self.btn_resume.setEnabled(False)
+            self.timer.start(100)
+            self.statusBar().showMessage("继续播放...", 2000)
+
+    def update_play_time(self):
+        if self.is_playing:
+            current_time = pygame.mixer.music.get_pos() / 1000
+            time_info = f"当前时间: {current_time:.2f} 秒"
+            self.statusBar().showMessage(time_info)
+
+    def set_bpm(self):
+        bpm, ok = QInputDialog.getInt(self, "设置BPM", "请输入BPM值:", self.bpm, 1, 300)
+        if ok:
+            self.bpm = bpm
+            self.statusBar().showMessage(f"BPM已设置为: {bpm}", 3000)
 
     def closeEvent(self, event):
         if pygame.mixer.get_init():

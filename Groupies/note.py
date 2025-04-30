@@ -24,7 +24,7 @@ class NoteSegment(LineSegment, Note):
         )
 
         # 初始化音乐属性
-        midi_value = 1500-int(self.y / 2 + 30)
+        midi_value = 109-self.y/20
         quarter_length = (self.right_x - self.left_x) / 160.0
         self.timing=int(self.left_x/20.0)
 
@@ -46,7 +46,7 @@ class NoteDrawWidget(LineDrawWidget):
     def draw_grid(self, painter):
         super().draw_grid(painter)
         painter.setPen(Qt.red)
-        painter.drawLine(0, 900, self.width(), 900)
+        painter.drawLine(0, 980, self.width(), 980)
 
     def play_a_music(self, notes):
         """播放给定的音符列表"""
