@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QPushButton, QMessageBox,
                              QScrollArea)
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, QTimer
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent
 import fitz
 
@@ -21,8 +21,6 @@ class PDFViewer(QWidget):
     def initUI(self):
         layout = QVBoxLayout(self)
         self.setLayout(layout)
-
-        self.update_scaled_pixmap()
 
         # PDF 显示区域，使用 QScrollArea
         self.scroll_area = QScrollArea()
@@ -87,7 +85,7 @@ class PDFViewer(QWidget):
         self.original_pixmap = QPixmap.fromImage(qimg)
 
         # 在这里根据当前窗口宽度进行初始缩放
-        self.update_scaled_pixmap()
+        QTimer.singleShot(0, self.update_scaled_pixmap)
 
         self.page_label.setText(f"第 {self.current_page + 1} 页 / 共 {self.total_pages} 页")
         self.update_buttons()
