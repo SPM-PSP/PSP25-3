@@ -1,6 +1,7 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
-                             QHBoxLayout, QLabel, QPushButton, QMessageBox)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
+                             QHBoxLayout, QLabel, QPushButton, QMessageBox,
+                             QScrollArea)
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent
 import fitz
@@ -21,11 +22,18 @@ class PDFViewer(QWidget):
         layout = QVBoxLayout(self)
         self.setLayout(layout)
 
-        # PDF 显示区域
+        self.update_scaled_pixmap()
+
+        # PDF 显示区域，使用 QScrollArea
+        self.scroll_area = QScrollArea()
         self.pdf_label = QLabel()
-        self.pdf_label.setAlignment(Qt.AlignCenter)
-        self.pdf_label.setMinimumSize(200, 150)
-        layout.addWidget(self.pdf_label,1)
+        self.pdf_label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        self.scroll_area.setWidget(self.pdf_label)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        layout.addWidget(self.scroll_area, 1)
+
 
         # 控制栏
         controls = QHBoxLayout()
@@ -58,9 +66,12 @@ class PDFViewer(QWidget):
 
     def update_scaled_pixmap(self):
         if self.original_pixmap:
-            available_size = self.pdf_label.size()
+            available_width = self.scroll_area.viewport().width()
+            # 计算缩放后的高度
+            aspect_ratio = self.original_pixmap.height() / self.original_pixmap.width()
+            scaled_height = int(available_width * aspect_ratio)
             scaled_pix = self.original_pixmap.scaled(
-                available_size,
+                available_width, scaled_height,
                 Qt.KeepAspectRatio,
                 Qt.SmoothTransformation
             )
@@ -75,7 +86,9 @@ class PDFViewer(QWidget):
         qimg = QImage(pix.samples, pix.width, pix.height, pix.stride, img_format)
         self.original_pixmap = QPixmap.fromImage(qimg)
 
+        # 在这里根据当前窗口宽度进行初始缩放
         self.update_scaled_pixmap()
+
         self.page_label.setText(f"第 {self.current_page + 1} 页 / 共 {self.total_pages} 页")
         self.update_buttons()
 
@@ -97,12 +110,3 @@ class PDFViewer(QWidget):
         if self.doc:
             self.doc.close()
         super().close()
-
-if __name__ == '__main__':
-    # 在此处指定你的PDF文件路径
-    pdf_path = "C:/Users/Goat/Documents/GitHub/PSP25-3/Groupies/tmp_works/tmp_20250422161246.pdf"  # 替换为你的实际路径
-
-    app = QApplication(sys.argv)
-    viewer = PDFViewer(pdf_path)
-    viewer.show()
-    sys.exit(app.exec_())

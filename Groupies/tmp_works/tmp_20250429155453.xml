@@ -5,7 +5,7 @@
   <identification>
     <creator type="composer">Music21</creator>
     <encoding>
-      <encoding-date>2025-04-24</encoding-date>
+      <encoding-date>2025-04-29</encoding-date>
       <software>music21 v.9.5.0</software>
     </encoding>
   </identification>
@@ -16,12 +16,12 @@
     </scaling>
   </defaults>
   <part-list>
-    <score-part id="Pa5a42cc7f6052493f7f3463471c11dad">
+    <score-part id="P532d6feeab9f3835a9a5b37b504983cf">
       <part-name />
     </score-part>
   </part-list>
   <!--=========================== Part 1 ===========================-->
-  <part id="Pa5a42cc7f6052493f7f3463471c11dad">
+  <part id="P532d6feeab9f3835a9a5b37b504983cf">
     <!--========================= Measure 1 ==========================-->
     <measure implicit="no" number="1">
       <attributes>
@@ -35,11 +35,6 @@
           <line>2</line>
         </clef>
       </attributes>
-      <note print-object="no" print-spacing="yes">
-        <rest />
-        <duration>1260</duration>
-        <type>32nd</type>
-      </note>
       <note>
         <pitch>
           <step>C</step>
@@ -47,50 +42,7 @@
           <octave>4</octave>
         </pitch>
         <duration>10080</duration>
-        <tie type="start" />
         <type>quarter</type>
-        <notations>
-          <tied type="start" />
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>C</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>1260</duration>
-        <tie type="stop" />
-        <type>32nd</type>
-        <notations>
-          <tied type="stop" />
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>D</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <tie type="start" />
-        <type>quarter</type>
-        <notations>
-          <tied type="start" />
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>D</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>1260</duration>
-        <tie type="stop" />
-        <type>32nd</type>
-        <notations>
-          <tied type="stop" />
-        </notations>
       </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>

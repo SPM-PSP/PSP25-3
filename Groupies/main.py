@@ -31,24 +31,10 @@ class MainWindow(QMainWindow):
     def initUI(self):
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
-        main_layout = QHBoxLayout(main_widget)
+        main_layout = QVBoxLayout(main_widget)
 
-        # 左侧面板
-        left_panel = QVBoxLayout()
-
-        # 项目控制区
-        project_layout = QVBoxLayout()
-        project_layout.addWidget(QLabel("项目名称:"))
-        self.project_name = QLineEdit()
-        project_layout.addWidget(self.project_name)
-
-        self.btn_new = QPushButton("显示乐谱")
-        self.btn_new.clicked.connect(self.open_xml)
-        project_layout.addWidget(self.btn_new)
-
-        self.btn_play = QPushButton("播放乐谱", self)
-        self.btn_play.clicked.connect(self.play_music)
-        project_layout.addWidget(self.btn_play)
+        # 上方面板
+        top_panel = QVBoxLayout()
 
         # 绘图滚动区
         self.draw_area = NoteDrawWidget()
@@ -60,41 +46,51 @@ class MainWindow(QMainWindow):
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
-        # 添加左侧组件
-        left_panel.addLayout(project_layout)
-        left_panel.addWidget(QLabel("音乐结构编辑区:"))
-        left_panel.addWidget(scroll_area)
+        # 添加上方组件
+        top_panel.addWidget(QLabel("音乐结构编辑区:"))
+        top_panel.addWidget(scroll_area)
 
-        # 右侧PDF面板
-        right_panel = QVBoxLayout()
-        right_panel.addWidget(QLabel("乐谱预览:"))
+        # 下方PDF面板
+        bottom_panel = QVBoxLayout()
+        bottom_panel.addWidget(QLabel("乐谱预览:"))
 
         # PDF滚动区域
         self.pdf_scroll = QScrollArea()
         self.pdf_scroll.setWidgetResizable(True)
-        right_panel.addWidget(self.pdf_scroll,1)
+        bottom_panel.addWidget(self.pdf_scroll, 1)
 
         # 设置主布局比例
-        main_layout.addLayout(left_panel, stretch=1)
-        main_layout.addLayout(right_panel, stretch=1)
+        main_layout.addLayout(top_panel, stretch=1)
+        main_layout.addLayout(bottom_panel, stretch=1)
 
         self.statusBar().showMessage("就绪")
         self.create_menus()
 
     def create_menus(self):
         menubar = self.menuBar()
+
+        # 添加显示乐谱按钮到菜单栏
+        self.btn_new = QAction("显示乐谱", self)
+        self.btn_new.triggered.connect(self.open_xml)
+        menubar.addAction(self.btn_new)
+
+        # 添加播放乐谱按钮到菜单栏
+        self.btn_play = QAction("播放乐谱", self)
+        self.btn_play.triggered.connect(self.play_music)
+        menubar.addAction(self.btn_play)
+
         file_menu = menubar.addMenu("文件(&F)")
         file_menu.addAction("新建").triggered.connect(self.new_project)
         file_menu.addAction("打开").triggered.connect(self.open_project)
         file_menu.addAction("保存").triggered.connect(self.save_project)
         file_menu.addSeparator()
         file_menu.addAction("退出").triggered.connect(self.close)
+
         help_menu = menubar.addMenu("帮助(&H)")
         help_menu.addAction("关于").triggered.connect(self.show_about)
 
     def new_project(self):
         self.draw_area.lines.clear()
-        self.project_name.clear()
         self.statusBar().showMessage("新建项目已创建", 2000)
         self.update()
 
@@ -105,8 +101,7 @@ class MainWindow(QMainWindow):
 
     def save_project(self):
         save_musicxml(self.draw_area.notes)
-        if self.project_name.text():
-            self.statusBar().showMessage("项目已保存", 2000)
+        self.statusBar().showMessage("项目已保存", 2000)
 
     def open_xml(self):
         try:
