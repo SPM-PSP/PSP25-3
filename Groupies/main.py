@@ -10,7 +10,7 @@ from piano import *
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QLineEdit,
                              QTextEdit, QStatusBar, QFileDialog, QAction, qApp,
-                             QScrollArea, QMessageBox, QInputDialog)
+                             QScrollArea, QMessageBox, QInputDialog, QSplitter)
 from PyQt5.QtGui import QIcon, QColor, QPainter, QPen, QFont, QPixmap, QImage
 from PyQt5.QtCore import Qt, QPointF, QSize, QTimer
 import fitz
@@ -18,6 +18,7 @@ from pdf_reader import PDFViewer
 
 project_root = Path(__file__).parent.resolve()
 sys.path.append(str(project_root))  # 添加项目根目录到路径
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -36,25 +37,11 @@ class MainWindow(QMainWindow):
     def initUI(self):
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
-        main_layout = QVBoxLayout(main_widget)
 
         # 上方面板
         self.draw_area = NoteDrawWidget()
         self.draw_area.main_window = self
         self.draw_area.setFixedSize(3000, 1760)
-        scroll_area = QScrollArea()
-        scroll_area.setWidget(self.draw_area)
-        scroll_area.setWidgetResizable(False)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-
-        top_panel = QVBoxLayout()
-        top_panel.addWidget(QLabel("音乐结构编辑区:"))
-
-        # 创建实际绘图区域
-        self.draw_area = NoteDrawWidget()
-        self.draw_area.setFixedSize(3000, 1760)
-        self.draw_area.main_window = self
 
         # 创建钢琴键区域
         self.piano_widget = PianoWidget(height=1760)
@@ -74,21 +61,17 @@ class MainWindow(QMainWindow):
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
-        top_panel.addLayout(QVBoxLayout())
-        top_panel.addWidget(scroll_area)
-
         # 下方PDF面板
-        bottom_panel = QVBoxLayout()
-        bottom_panel.addWidget(QLabel("乐谱预览:"))
-
-        # PDF滚动区域
         self.pdf_scroll = QScrollArea()
         self.pdf_scroll.setWidgetResizable(True)
-        bottom_panel.addWidget(self.pdf_scroll, 1)
 
-        # 设置主布局比例
-        main_layout.addLayout(top_panel, stretch=1)
-        main_layout.addLayout(bottom_panel, stretch=1)
+        # 使用QSplitter布局上下区域
+        splitter = QSplitter(Qt.Vertical)
+        splitter.addWidget(scroll_area)
+        splitter.addWidget(self.pdf_scroll)
+
+        main_layout = QVBoxLayout(main_widget)
+        main_layout.addWidget(splitter)
 
         self.statusBar().showMessage("就绪")
         self.create_menus()
@@ -181,6 +164,7 @@ class MainWindow(QMainWindow):
                 self.btn_pause.setEnabled(False)
                 self.btn_resume.setEnabled(False)
                 self.statusBar().showMessage("播放已停止", 2000)
+                self.draw_area.draw_vertical_line_at_x(None)  # 停止播放时移除竖线
                 return
 
             score_stream = convert_notes_to_stream(self.draw_area.notes, self.bpm)
@@ -194,7 +178,7 @@ class MainWindow(QMainWindow):
             self.btn_play.setText("停止播放")
             self.btn_pause.setEnabled(True)
             self.btn_resume.setEnabled(False)
-            self.timer.start(100)  # 每100毫秒更新一次时间
+            self.timer.start(10)  # 每50毫秒更新一次时间
             self.statusBar().showMessage("正在播放... 按播放键可停止", 2000)
 
         except Exception as e:
@@ -215,7 +199,7 @@ class MainWindow(QMainWindow):
             self.is_playing = True
             self.btn_pause.setEnabled(True)
             self.btn_resume.setEnabled(False)
-            self.timer.start(100)
+            self.timer.start(10)
             self.statusBar().showMessage("继续播放...", 2000)
 
     def update_play_time(self):
@@ -223,6 +207,26 @@ class MainWindow(QMainWindow):
             current_time = pygame.mixer.music.get_pos() / 1000
             time_info = f"当前时间: {current_time:.2f} 秒"
             self.statusBar().showMessage(time_info)
+
+            # 根据BPM和当前时间计算竖线位置
+            beats_per_minute = self.bpm
+            seconds_per_beat = 60 / beats_per_minute
+            current_beat = current_time / seconds_per_beat
+            grid_size = self.draw_area.grid_size
+            pixels_per_beat = 8 * grid_size  # 8个格子为一拍
+            x_position = int(current_beat * pixels_per_beat)
+
+            # 绘制竖线
+            self.draw_area.draw_vertical_line_at_x(x_position)
+
+            if not pygame.mixer.music.get_busy():
+                self.is_playing = False
+                self.btn_play.setText("播放乐谱")
+                self.btn_pause.setEnabled(False)
+                self.btn_resume.setEnabled(False)
+                self.timer.stop()
+                self.statusBar().showMessage("播放已结束", 2000)
+                self.draw_area.draw_vertical_line_at_x(None)  # 播放结束时移除竖线
 
     def set_bpm(self):
         bpm, ok = QInputDialog.getInt(self, "设置BPM", "请输入BPM值:", self.bpm, 1, 300)
