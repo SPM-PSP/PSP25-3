@@ -1,0 +1,23 @@
+{
+    "song_name": "",
+    "author_name": "",
+    "bpm": 120,
+    "notes": [
+        {
+            "left_x": 0,
+            "right_x": 160.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 1.0,
+            "timing": 0
+        },
+        {
+            "left_x": 160,
+            "right_x": 300.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 0.875,
+            "timing": 8
+        }
+    ]
+}

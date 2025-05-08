@@ -36,12 +36,46 @@ class NoteSegment(LineSegment, Note):
 
         pygame.mixer.init()
 
+    def to_dict(self):
+        return {
+            "left_x": self.left_x,
+            "right_x": self.right_x,
+            "y": self.y,
+            #"color": self.color,
+            "midi_value": self.pitch.midi,
+            "quarter_length": self.duration.quarterLength,
+            "timing": self.timing
+        }
+
 
 class NoteDrawWidget(LineDrawWidget):
     def __init__(self):
         super().__init__()  # 使用super()正确初始化父类
         self.notes = []
         self.main_window = None
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # 绘制网格
+        self.draw_grid(painter)
+
+        # 绘制所有线段
+        for line in self.lines:
+            self.draw_line(painter, line)
+
+        # 绘制临时线段
+        if self.temp_line:
+            self.draw_line(painter, self.temp_line)
+
+        # 绘制音符
+        for note in self.notes:
+            self.draw_line(painter, note)  # 假设音符的绘制逻辑和线段相同
+
+        # 绘制竖线
+        if self.vertical_line_x is not None:
+            self.draw_vertical_line(painter, self.vertical_line_x)
 
     def draw_grid(self, painter):
         super().draw_grid(painter)
@@ -89,6 +123,7 @@ class NoteDrawWidget(LineDrawWidget):
                     pos.y() / self.grid_size) * self.grid_size + 20,
                 color=self.current_color
             )
+
         elif event.button() == Qt.RightButton:
             # 反向遍历避免索引错乱
             for i in reversed(range(len(self.lines))):

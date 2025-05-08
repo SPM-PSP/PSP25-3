@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise  PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="4.0">
-  <movement-title>Music21 Fragment</movement-title>
+  <work>
+    <work-title>小星星</work-title>
+  </work>
+  <movement-title>小星星</movement-title>
   <identification>
-    <creator type="composer">Music21</creator>
+    <creator type="composer" />
     <encoding>
-      <encoding-date>2025-05-07</encoding-date>
+      <encoding-date>2025-05-08</encoding-date>
       <software>music21 v.9.5.0</software>
     </encoding>
   </identification>
@@ -16,12 +19,12 @@
     </scaling>
   </defaults>
   <part-list>
-    <score-part id="P53b182b393330ef78a2e100aa0aabd42">
+    <score-part id="Pfc01f4e24700db73379175f1e13166a9">
       <part-name />
     </score-part>
   </part-list>
   <!--=========================== Part 1 ===========================-->
-  <part id="P53b182b393330ef78a2e100aa0aabd42">
+  <part id="Pfc01f4e24700db73379175f1e13166a9">
     <!--========================= Measure 1 ==========================-->
     <measure implicit="no" number="1">
       <attributes>
@@ -47,33 +50,6 @@
       <note>
         <pitch>
           <step>C</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-      </note>
-      <note>
-        <pitch>
-          <step>D</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-      </note>
-      <note>
-        <pitch>
-          <step>E</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-      </note>
-      <note>
-        <pitch>
-          <step>F</step>
           <alter>0</alter>
           <octave>4</octave>
         </pitch>

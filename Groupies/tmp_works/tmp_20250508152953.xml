@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise  PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="4.0">
-  <movement-title>Music21 Fragment</movement-title>
+  <work>
+    <work-title>123</work-title>
+  </work>
+  <movement-title>123</movement-title>
   <identification>
-    <creator type="composer">Music21</creator>
+    <creator type="composer">456231</creator>
     <encoding>
-      <encoding-date>2025-05-07</encoding-date>
+      <encoding-date>2025-05-08</encoding-date>
       <software>music21 v.9.5.0</software>
     </encoding>
   </identification>
@@ -16,12 +19,12 @@
     </scaling>
   </defaults>
   <part-list>
-    <score-part id="P70131ab1df0184aa90eb15e37bdb51ad">
+    <score-part id="Pc1bb3c43fac084d8d5c9464071f1bfb7">
       <part-name />
     </score-part>
   </part-list>
   <!--=========================== Part 1 ===========================-->
-  <part id="P70131ab1df0184aa90eb15e37bdb51ad">
+  <part id="Pc1bb3c43fac084d8d5c9464071f1bfb7">
     <!--========================= Measure 1 ==========================-->
     <measure implicit="no" number="1">
       <attributes>
@@ -50,78 +53,41 @@
           <alter>0</alter>
           <octave>4</octave>
         </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
+        <duration>7560</duration>
+        <type>eighth</type>
+        <dot />
       </note>
       <note>
-        <pitch>
-          <step>D</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-      </note>
-      <note>
-        <pitch>
-          <step>E</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-      </note>
-      <note>
-        <pitch>
-          <step>F</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-      </note>
-    </measure>
-    <!--========================= Measure 2 ==========================-->
-    <measure implicit="no" number="2">
-      <note>
-        <pitch>
-          <step>G</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-        <accidental>natural</accidental>
-      </note>
-      <note>
-        <pitch>
-          <step>A</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-        <accidental>natural</accidental>
-      </note>
-      <note>
-        <pitch>
-          <step>B</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
-        <accidental>natural</accidental>
+        <rest />
+        <duration>1260</duration>
+        <type>32nd</type>
       </note>
       <note>
         <pitch>
           <step>C</step>
           <alter>0</alter>
-          <octave>5</octave>
+          <octave>4</octave>
         </pitch>
-        <duration>10080</duration>
-        <type>quarter</type>
+        <duration>5040</duration>
+        <tie type="start" />
+        <type>eighth</type>
         <accidental>natural</accidental>
+        <notations>
+          <tied type="start" />
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <alter>0</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>1260</duration>
+        <tie type="stop" />
+        <type>32nd</type>
+        <notations>
+          <tied type="stop" />
+        </notations>
       </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>

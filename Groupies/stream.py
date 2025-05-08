@@ -11,6 +11,7 @@ from datetime import datetime
 from music21 import stream, note, chord, tempo
 from merge import SegmentStructure
 
+
 def convert_notes_to_stream(Notelist, bpm=120):
     s = stream.Stream()
     # 设置bpm
@@ -19,7 +20,7 @@ def convert_notes_to_stream(Notelist, bpm=120):
 
     structure = SegmentStructure()
     for noteelement in Notelist:
-        structure.add_segment(noteelement.left_x,  noteelement.right_x , 109 - noteelement.y / 20)
+        structure.add_segment(noteelement.left_x, noteelement.right_x, 109 - noteelement.y / 20)
     result, rest = structure.compute_result()
     for element in result:
         if len(element[2]) == 1:
@@ -36,7 +37,7 @@ def convert_notes_to_stream(Notelist, bpm=120):
     return s
 
 
-def save_musicxml(notes):
+def save_musicxml(notes, bpm, song_name="untitled", author_name="unnamed"):
     """保存为MusicXML文件"""
     # 获取保存路径
     filepath, _ = QFileDialog.getSaveFileName(
@@ -49,7 +50,13 @@ def save_musicxml(notes):
         return
 
     # 生成乐谱流
-    score_stream = convert_notes_to_stream(notes)
+    score_stream = convert_notes_to_stream(notes, bpm)
+
+    # 设置元数据
+    meta = metadata.Metadata()
+    meta.title = song_name
+    meta.composer = author_name
+    score_stream.insert(0, meta)
 
     # 保存文件
     score_stream.write('musicxml', fp=filepath)
@@ -61,7 +68,7 @@ def save_musicxml(notes):
     score_stream.show('musicxml')
 
 
-def auto_save_musicxml(notes):
+def auto_save_musicxml(notes, bpm, song_name="untitled", author_name="unnamed"):
     """自动保存乐谱到tmp_works目录"""
 
     # 创建保存目录（如果不存在）
@@ -74,7 +81,13 @@ def auto_save_musicxml(notes):
     filepath = os.path.join(save_dir, filename)
 
     # 生成乐谱流
-    score_stream = convert_notes_to_stream(notes)
+    score_stream = convert_notes_to_stream(notes, bpm)
+
+    # 设置元数据
+    meta = metadata.Metadata()
+    meta.title = song_name
+    meta.composer = author_name
+    score_stream.insert(0, meta)
 
     # 保存文件
     score_stream.write('musicxml', fp=filepath)
@@ -85,6 +98,7 @@ def auto_save_musicxml(notes):
         os.remove(os.path.join(save_dir, old_file))
 
     return filename
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
