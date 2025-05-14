@@ -1,0 +1,191 @@
+{
+    "song_name": "多年以后",
+    "author_name": "高俊翔",
+    "bpm": 120,
+    "notes": [
+        {
+            "left_x": 0,
+            "right_x": 160.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 1.0,
+            "timing": 0
+        },
+        {
+            "left_x": 160,
+            "right_x": 240.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 0.5,
+            "timing": 8
+        },
+        {
+            "left_x": 240,
+            "right_x": 320.0,
+            "y": 940,
+            "midi_value": 62,
+            "quarter_length": 0.5,
+            "timing": 12
+        },
+        {
+            "left_x": 320,
+            "right_x": 480.0,
+            "y": 900,
+            "midi_value": 64,
+            "quarter_length": 1.0,
+            "timing": 16
+        },
+        {
+            "left_x": 480,
+            "right_x": 560.0,
+            "y": 900,
+            "midi_value": 64,
+            "quarter_length": 0.5,
+            "timing": 24
+        },
+        {
+            "left_x": 560,
+            "right_x": 640.0,
+            "y": 880,
+            "midi_value": 65,
+            "quarter_length": 0.5,
+            "timing": 28
+        },
+        {
+            "left_x": 640,
+            "right_x": 800.0,
+            "y": 840,
+            "midi_value": 67,
+            "quarter_length": 1.0,
+            "timing": 32
+        },
+        {
+            "left_x": 800,
+            "right_x": 880.0,
+            "y": 800,
+            "midi_value": 69,
+            "quarter_length": 0.5,
+            "timing": 40
+        },
+        {
+            "left_x": 880,
+            "right_x": 960.0,
+            "y": 840,
+            "midi_value": 67,
+            "quarter_length": 0.5,
+            "timing": 44
+        },
+        {
+            "left_x": 960,
+            "right_x": 1120.0,
+            "y": 900,
+            "midi_value": 64,
+            "quarter_length": 1.0,
+            "timing": 48
+        },
+        {
+            "left_x": 1280,
+            "right_x": 1440.0,
+            "y": 840,
+            "midi_value": 67,
+            "quarter_length": 1.0,
+            "timing": 64
+        },
+        {
+            "left_x": 1440,
+            "right_x": 1520.0,
+            "y": 880,
+            "midi_value": 65,
+            "quarter_length": 0.5,
+            "timing": 72
+        },
+        {
+            "left_x": 1520,
+            "right_x": 1600.0,
+            "y": 900,
+            "midi_value": 64,
+            "quarter_length": 0.5,
+            "timing": 76
+        },
+        {
+            "left_x": 1600,
+            "right_x": 1760.0,
+            "y": 940,
+            "midi_value": 62,
+            "quarter_length": 1.0,
+            "timing": 80
+        },
+        {
+            "left_x": 1760,
+            "right_x": 1840.0,
+            "y": 1040,
+            "midi_value": 57,
+            "quarter_length": 0.5,
+            "timing": 88
+        },
+        {
+            "left_x": 1840,
+            "right_x": 1920.0,
+            "y": 1040,
+            "midi_value": 57,
+            "quarter_length": 0.5,
+            "timing": 92
+        },
+        {
+            "left_x": 1920,
+            "right_x": 2080.0,
+            "y": 880,
+            "midi_value": 65,
+            "quarter_length": 1.0,
+            "timing": 96
+        },
+        {
+            "left_x": 2080,
+            "right_x": 2160.0,
+            "y": 900,
+            "midi_value": 64,
+            "quarter_length": 0.5,
+            "timing": 104
+        },
+        {
+            "left_x": 2160,
+            "right_x": 2240.0,
+            "y": 940,
+            "midi_value": 62,
+            "quarter_length": 0.5,
+            "timing": 108
+        },
+        {
+            "left_x": 2240,
+            "right_x": 2400.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 1.0,
+            "timing": 112
+        },
+        {
+            "left_x": 2560,
+            "right_x": 2720.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 1.0,
+            "timing": 128
+        },
+        {
+            "left_x": 2720,
+            "right_x": 2800.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 0.5,
+            "timing": 136
+        },
+        {
+            "left_x": 2800,
+            "right_x": 2880.0,
+            "y": 940,
+            "midi_value": 62,
+            "quarter_length": 0.5,
+            "timing": 140
+        }
+    ]
+}

@@ -1,4 +1,4 @@
-from draw import *
+from module.draw import *
 from music21.note import Note
 from music21 import pitch, duration, tempo
 import sys
@@ -9,7 +9,7 @@ import pygame
 import tempfile
 import numpy as np
 from scipy.signal import butter, lfilter
-from stream import *
+from module.stream import *
 import copy
 
 class NoteSegment(LineSegment, Note):
@@ -89,7 +89,7 @@ class NoteDrawWidget(LineDrawWidget):
                 pygame.mixer.music.stop()
 
             # 转换音符为流并生成MIDI
-            from stream import convert_notes_to_stream
+            from module.stream import convert_notes_to_stream
             score_stream = convert_notes_to_stream(notes)
             with tempfile.NamedTemporaryFile(suffix='.mid', delete=False) as midi_file:
                 current_midi = midi_file.name

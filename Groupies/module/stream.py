@@ -2,14 +2,13 @@ from music21 import *
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt
-from note import MainWindow
 from PyQt5.QtWidgets import QFileDialog
 import sys
 import os
-from merge import SegmentStructure
+from module.merge import SegmentStructure
 from datetime import datetime
 from music21 import stream, note, chord, tempo
-from merge import SegmentStructure
+from module.merge import SegmentStructure
 
 
 def convert_notes_to_stream(Notelist, bpm=120):

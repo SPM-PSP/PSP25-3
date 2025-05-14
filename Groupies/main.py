@@ -1,13 +1,13 @@
-from draw import *
-from stream import *
-from note import *
+from module.draw import *
+from module.stream import *
+from module.note import *
 from pathlib import Path
 import pygame
 import tempfile
 import sys
 import os
 import json
-from piano import *
+from module.piano import *
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QLineEdit,
                              QTextEdit, QStatusBar, QFileDialog, QAction, qApp,
@@ -16,7 +16,7 @@ from PyQt5.QtGui import QIcon, QColor, QPainter, QPen, QFont, QPixmap, QImage
 from PyQt5.QtCore import Qt, QPointF, QSize, QTimer
 
 import fitz
-from pdf_reader import PDFViewer
+from module.pdf_reader import PDFViewer
 
 project_root = Path(__file__).parent.resolve()
 sys.path.append(str(project_root))  # 添加项目根目录到路径
