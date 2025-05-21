@@ -4,7 +4,7 @@ from music21 import pitch, duration, tempo
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPainter
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal, QPoint
 import pygame
 import tempfile
 import numpy as np
@@ -49,10 +49,14 @@ class NoteSegment(LineSegment, Note):
 
 
 class NoteDrawWidget(LineDrawWidget):
+    mouseMoveSignal = pyqtSignal(QPoint)
     def __init__(self):
         super().__init__()  # 使用super()正确初始化父类
         self.notes = []
         self.main_window = None
+        self.margin = 0
+        self.Width = 3000
+        self.setMinimumSize(self.Width, 1760)
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -132,6 +136,10 @@ class NoteDrawWidget(LineDrawWidget):
                     del self.notes[i]
                     self.update()
                     break
+
+    def mouseMoveEvent(self, event):
+        self.mouseMoveSignal.emit(event.pos())
+        super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton and self.temp_line:

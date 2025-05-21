@@ -65,19 +65,18 @@ class MainWindow(QMainWindow):
         self.draw_area = NoteDrawWidget()
         self.draw_area.main_window = self
         self.draw_area.setFixedSize(3000, 1760)
-        draw_scroll_area = QScrollArea()
-        draw_scroll_area.setWidget(self.draw_area)
-        draw_scroll_area.setWidgetResizable(False)
-        draw_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        draw_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        top_layout.addWidget(draw_scroll_area)
-
+        self.draw_scroll_area = QScrollArea()
+        self.draw_scroll_area.setWidget(self.draw_area)
+        self.draw_scroll_area.setWidgetResizable(False)
+        self.draw_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.draw_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.draw_area.mouseMoveSignal.connect(self.handle_mouse_move)
+        top_layout.addWidget(self.draw_scroll_area)
         # 联动垂直滚动条
-        draw_scroll_area.verticalScrollBar().valueChanged.connect(
+        self.draw_scroll_area.verticalScrollBar().valueChanged.connect(
             piano_scroll_area.verticalScrollBar().setValue)
         piano_scroll_area.verticalScrollBar().valueChanged.connect(
-            draw_scroll_area.verticalScrollBar().setValue)
-
+            self.draw_scroll_area.verticalScrollBar().setValue)
         # 下方PDF面板
         self.pdf_scroll = QScrollArea()
         self.pdf_scroll.setWidgetResizable(True)
@@ -93,6 +92,43 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("就绪")
         self.create_menus()
 
+    def handle_mouse_move(self, pos):
+        """ 处理鼠标移动自动滚动（禁止左边界回退）"""
+        # 将坐标转换为容器坐标系
+        container_pos = self.draw_area.mapTo(self.draw_area, pos)
+        print(container_pos)
+        # 获取当前滚动条状态
+        h_scroll = self.draw_scroll_area.horizontalScrollBar()
+        current_scroll = h_scroll.value()
+        viewport_width = self.draw_scroll_area.viewport().width()
+
+        # 计算理想目标位置（中心对齐）
+        ideal_target = container_pos.x() - viewport_width + 20
+        # 只允许向右滚动（当鼠标在右半屏时生效）
+        if ideal_target > 0:
+            # 动态扩展区域（当接近右边界时）
+            if container_pos.x() > self.draw_area.width() - viewport_width // 2:
+                self.expand_draw_area(20)  # 每次扩展20像素
+
+            # 设置滚动位置（限制不超过最大值）
+            safe_target = min(ideal_target, h_scroll.maximum())
+            print(safe_target)
+            h_scroll.setValue(safe_target)
+
+        # 完全禁止向左滚动（注释掉else部分）
+        #else:
+        #    h_scroll.setValue(current_scroll)  # 维持原位置
+    def expand_draw_area(self, x):
+        """ 扩展绘制区域 """
+        self.draw_area.Width += x
+        self.draw_area.setFixedWidth(self.draw_area.Width)
+
+        # 更新布局
+        self.draw_scroll_area.adjustSize()
+
+        # 自动滚动到新增区域
+        h_scroll = self.draw_scroll_area.horizontalScrollBar()
+        h_scroll.setValue(h_scroll.maximum())
     def create_menus(self):
         menubar = self.menuBar()
 
