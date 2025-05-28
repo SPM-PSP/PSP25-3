@@ -20,7 +20,7 @@ from module.pdf_reader import PDFViewer
 
 project_root = Path(__file__).parent.resolve()
 sys.path.append(str(project_root))  # 添加项目根目录到路径
-
+MAX_DRAW_WIDTH = 800000
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -93,42 +93,55 @@ class MainWindow(QMainWindow):
         self.create_menus()
 
     def handle_mouse_move(self, pos):
-        """ 处理鼠标移动自动滚动（禁止左边界回退）"""
-        # 将坐标转换为容器坐标系
+        """处理鼠标移动自动滚动（完全禁止向左滚动）"""
+        # 坐标系转换
         container_pos = self.draw_area.mapTo(self.draw_area, pos)
-        print(container_pos)
-        # 获取当前滚动条状态
+
+        # 获取滚动条和视口参数
         h_scroll = self.draw_scroll_area.horizontalScrollBar()
-        current_scroll = h_scroll.value()
+        current_value = h_scroll.value()
         viewport_width = self.draw_scroll_area.viewport().width()
 
-        # 计算理想目标位置（中心对齐）
+        # 计算理想滚动位置（鼠标在视口右20像素处）
         ideal_target = container_pos.x() - viewport_width + 20
-        # 只允许向右滚动（当鼠标在右半屏时生效）
-        if ideal_target > 0:
+
+        # 当需要向右滚动时
+        if ideal_target > current_value:  # 修改判断条件
             # 动态扩展区域（当接近右边界时）
             if container_pos.x() > self.draw_area.width() - viewport_width // 2:
-                self.expand_draw_area(20)  # 每次扩展20像素
+                self.expand_draw_area(20)
 
-            # 设置滚动位置（限制不超过最大值）
+            # 计算安全滚动位置（限制在最大值范围内）
             safe_target = min(ideal_target, h_scroll.maximum())
-            print(safe_target)
             h_scroll.setValue(safe_target)
+        else:
+            # 主动锁定滚动条位置（核心修改）
+            h_scroll.setValue(current_value)  # 强制保持当前位置
 
-        # 完全禁止向左滚动（注释掉else部分）
-        #else:
-        #    h_scroll.setValue(current_scroll)  # 维持原位置
+        # 完全禁止向左滚动（即使通过其他方式操作滚动条）
+        if h_scroll.value() < current_value:
+            h_scroll.setValue(current_value)
+
     def expand_draw_area(self, x):
-        """ 扩展绘制区域 """
-        self.draw_area.Width += x
-        self.draw_area.setFixedWidth(self.draw_area.Width)
+        """安全扩展绘制区域"""
+        current_width = self.draw_area.width()
 
-        # 更新布局
-        self.draw_scroll_area.adjustSize()
+        if current_width >= MAX_DRAW_WIDTH:
+            return
 
-        # 自动滚动到新增区域
-        h_scroll = self.draw_scroll_area.horizontalScrollBar()
-        h_scroll.setValue(h_scroll.maximum())
+        new_width = min(current_width + x, MAX_DRAW_WIDTH)
+        self.draw_area.setFixedWidth(new_width)
+
+        # 强制布局更新
+        self.draw_scroll_area.widget().updateGeometry()
+        self.draw_scroll_area.viewport().update()
+
+        # 确保滚动条更新后跳转
+        QTimer.singleShot(10, lambda:
+        self.draw_scroll_area.horizontalScrollBar().setValue(
+            self.draw_scroll_area.horizontalScrollBar().maximum()
+        ))
+
     def create_menus(self):
         menubar = self.menuBar()
 
