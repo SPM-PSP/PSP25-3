@@ -1,23 +1,26 @@
-from draw import *
-from stream import *
-from note import *
+from module.draw import *
+from module.stream import *
+from module.note import *
 from pathlib import Path
 import pygame
 import tempfile
 import sys
 import os
-from piano import *
+import json
+from module.piano import *
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QLineEdit,
                              QTextEdit, QStatusBar, QFileDialog, QAction, qApp,
-                             QScrollArea, QMessageBox, QInputDialog)
+                             QScrollArea, QMessageBox, QInputDialog, QSplitter)
 from PyQt5.QtGui import QIcon, QColor, QPainter, QPen, QFont, QPixmap, QImage
 from PyQt5.QtCore import Qt, QPointF, QSize, QTimer
+
 import fitz
-from pdf_reader import PDFViewer
+from module.pdf_reader import PDFViewer
 
 project_root = Path(__file__).parent.resolve()
 sys.path.append(str(project_root))  # 添加项目根目录到路径
+MAX_DRAW_WIDTH = 800000
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -32,66 +35,112 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_play_time)
         self.bpm = 120  # 默认bpm为120
         pygame.mixer.init()
+        # 新增乐曲名和作者名变量
+        self.song_name = ""
+        self.author_name = ""
 
     def initUI(self):
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
-        main_layout = QVBoxLayout(main_widget)
 
         # 上方面板
-        self.draw_area = NoteDrawWidget()
-        self.draw_area.main_window = self
-        self.draw_area.setFixedSize(3000, 1760)
-        scroll_area = QScrollArea()
-        scroll_area.setWidget(self.draw_area)
-        scroll_area.setWidgetResizable(False)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        top_panel = QWidget()
+        top_layout = QHBoxLayout(top_panel)
 
-        top_panel = QVBoxLayout()
-        top_panel.addWidget(QLabel("音乐结构编辑区:"))
-
-        # 创建实际绘图区域
-        self.draw_area = NoteDrawWidget()
-        self.draw_area.setFixedSize(3000, 1760)
-        self.draw_area.main_window = self
-
-        # 创建钢琴键区域
+        # 创建钢琴键区域并放入滚动区域
         self.piano_widget = PianoWidget(height=1760)
+        piano_scroll_area = QScrollArea()
+        piano_scroll_area.setWidget(self.piano_widget)
+        piano_scroll_area.setWidgetResizable(False)
+        # 隐藏钢琴区域的水平和垂直滚动条
+        piano_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        piano_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        top_layout.addWidget(piano_scroll_area)
 
-        # 创建编辑区容器（包含钢琴键 + 绘图）
-        editor_container = QWidget()
-        editor_layout = QHBoxLayout(editor_container)
-        editor_layout.setContentsMargins(0, 0, 0, 0)
-        editor_layout.setSpacing(0)
-        editor_layout.addWidget(self.piano_widget)
-        editor_layout.addWidget(self.draw_area)
+        # 设置钢琴区域的宽度
+        piano_width = 120  # 可根据需要修改这个值
+        piano_scroll_area.setFixedWidth(piano_width)
 
-        # 将容器加入 scroll_area，实现联动滚动
-        scroll_area = QScrollArea()
-        scroll_area.setWidget(editor_container)
-        scroll_area.setWidgetResizable(False)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-
-        top_panel.addLayout(QVBoxLayout())
-        top_panel.addWidget(scroll_area)
-
+        # 创建绘图区域并放入滚动区域
+        self.draw_area = NoteDrawWidget()
+        self.draw_area.main_window = self
+        self.draw_area.setFixedSize(3000, 1760)
+        self.draw_scroll_area = QScrollArea()
+        self.draw_scroll_area.setWidget(self.draw_area)
+        self.draw_scroll_area.setWidgetResizable(False)
+        self.draw_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.draw_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.draw_area.mouseMoveSignal.connect(self.handle_mouse_move)
+        top_layout.addWidget(self.draw_scroll_area)
+        # 联动垂直滚动条
+        self.draw_scroll_area.verticalScrollBar().valueChanged.connect(
+            piano_scroll_area.verticalScrollBar().setValue)
+        piano_scroll_area.verticalScrollBar().valueChanged.connect(
+            self.draw_scroll_area.verticalScrollBar().setValue)
         # 下方PDF面板
-        bottom_panel = QVBoxLayout()
-        bottom_panel.addWidget(QLabel("乐谱预览:"))
-
-        # PDF滚动区域
         self.pdf_scroll = QScrollArea()
         self.pdf_scroll.setWidgetResizable(True)
-        bottom_panel.addWidget(self.pdf_scroll, 1)
 
-        # 设置主布局比例
-        main_layout.addLayout(top_panel, stretch=1)
-        main_layout.addLayout(bottom_panel, stretch=1)
+        # 使用QSplitter布局上下区域
+        splitter = QSplitter(Qt.Vertical)
+        splitter.addWidget(top_panel)
+        splitter.addWidget(self.pdf_scroll)
+
+        main_layout = QVBoxLayout(main_widget)
+        main_layout.addWidget(splitter)
 
         self.statusBar().showMessage("就绪")
         self.create_menus()
+
+    def handle_mouse_move(self, pos):
+        """处理鼠标移动自动滚动（完全禁止向左滚动）"""
+        # 坐标系转换
+        container_pos = self.draw_area.mapTo(self.draw_area, pos)
+
+        # 获取滚动条和视口参数
+        h_scroll = self.draw_scroll_area.horizontalScrollBar()
+        current_value = h_scroll.value()
+        viewport_width = self.draw_scroll_area.viewport().width()
+
+        # 计算理想滚动位置（鼠标在视口右20像素处）
+        ideal_target = container_pos.x() - viewport_width + 20
+
+        # 当需要向右滚动时
+        if ideal_target > current_value:  # 修改判断条件
+            # 动态扩展区域（当接近右边界时）
+            if container_pos.x() > self.draw_area.width() - viewport_width // 2:
+                self.expand_draw_area(20)
+
+            # 计算安全滚动位置（限制在最大值范围内）
+            safe_target = min(ideal_target, h_scroll.maximum())
+            h_scroll.setValue(safe_target)
+        else:
+            # 主动锁定滚动条位置（核心修改）
+            h_scroll.setValue(current_value)  # 强制保持当前位置
+
+        # 完全禁止向左滚动（即使通过其他方式操作滚动条）
+        if h_scroll.value() < current_value:
+            h_scroll.setValue(current_value)
+
+    def expand_draw_area(self, x):
+        """安全扩展绘制区域"""
+        current_width = self.draw_area.width()
+
+        if current_width >= MAX_DRAW_WIDTH:
+            return
+
+        new_width = min(current_width + x, MAX_DRAW_WIDTH)
+        self.draw_area.setFixedWidth(new_width)
+
+        # 强制布局更新
+        self.draw_scroll_area.widget().updateGeometry()
+        self.draw_scroll_area.viewport().update()
+
+        # 确保滚动条更新后跳转
+        QTimer.singleShot(10, lambda:
+        self.draw_scroll_area.horizontalScrollBar().setValue(
+            self.draw_scroll_area.horizontalScrollBar().maximum()
+        ))
 
     def create_menus(self):
         menubar = self.menuBar()
@@ -122,6 +171,7 @@ class MainWindow(QMainWindow):
         file_menu.addAction("新建").triggered.connect(self.new_project)
         file_menu.addAction("打开").triggered.connect(self.open_project)
         file_menu.addAction("保存").triggered.connect(self.save_project)
+        file_menu.addAction("另存为xml").triggered.connect(self.save_asxml)
         file_menu.addSeparator()
         file_menu.addAction("退出").triggered.connect(self.close)
 
@@ -131,27 +181,102 @@ class MainWindow(QMainWindow):
         set_bpm_action.triggered.connect(self.set_bpm)
         settings_menu.addAction(set_bpm_action)
 
+        # 添加修改乐曲名菜单项
+        set_song_name_action = QAction("修改乐曲名", self)
+        set_song_name_action.triggered.connect(self.set_song_name)
+        settings_menu.addAction(set_song_name_action)
+
+        # 添加修改作者名菜单项
+        set_author_name_action = QAction("修改作者名", self)
+        set_author_name_action.triggered.connect(self.set_author_name)
+        settings_menu.addAction(set_author_name_action)
+
         help_menu = menubar.addMenu("帮助(&H)")
         help_menu.addAction("关于").triggered.connect(self.show_about)
 
     def new_project(self):
+        # 弹出窗口要求填写乐曲名和作者名
+        song_name, ok1 = QInputDialog.getText(self, "新建项目", "请输入乐曲名:")
+        if not ok1:
+            return
+        author_name, ok2 = QInputDialog.getText(self, "新建项目", "请输入作者名:")
+        if not ok2:
+            return
+
+        self.song_name = song_name
+        self.author_name = author_name
+
         self.draw_area.lines.clear()
-        self.statusBar().showMessage("新建项目已创建", 2000)
+        self.draw_area.notes.clear()  # 清空音符信息
+        self.statusBar().showMessage("新建项目已创建，乐曲名: {}, 作者名: {}".format(song_name, author_name), 2000)
         self.update()
 
     def open_project(self):
         filename, _ = QFileDialog.getOpenFileName(self, "打开项目", "", "项目文件 (*.proj)")
         if filename:
-            self.statusBar().showMessage(f"已打开项目: {filename}", 3000)
+            try:
+                with open(filename, 'r', encoding='utf-8') as file:
+                    data = json.load(file)
+                    self.song_name = data.get('song_name', "")
+                    self.author_name = data.get('author_name', "")
+                    self.bpm = data.get('bpm', 120)
+                    self.draw_area.notes = []
+                    self.draw_area.lines = []  # 清空线条信息
+                    for note_dict in data.get('notes', []):
+                        line = LineSegment(
+                            left_x=note_dict['left_x'],
+                            right_x=note_dict['right_x'],
+                            y=note_dict['y'],
+                            color=QColor(173, 216, 230)
+                        )
+                        note = NoteSegment(line)
+                        note.pitch.midi = note_dict['midi_value']
+                        note.duration.quarterLength = note_dict['quarter_length']
+                        note.timing = note_dict['timing']
+                        self.draw_area.notes.append(note)
+                        self.draw_area.lines.append(line)  # 更新 self.lines 列表
+                    self.draw_area.update()
+                    self.draw_area.repaint()
+                    self.statusBar().showMessage(f"已打开项目: {filename}", 3000)
+            except Exception as e:
+                self.statusBar().showMessage(f"打开项目失败: {str(e)}", 5000)
+                QMessageBox.critical(self, "错误", f"无法打开项目: {str(e)}")
 
     def save_project(self):
-        save_musicxml(self.draw_area.notes)
-        self.statusBar().showMessage("项目已保存", 2000)
+        # 生成默认文件名
+        if self.song_name and self.author_name:
+            default_filename = f"{self.song_name}_by{self.author_name}.proj"
+        elif self.song_name:
+            default_filename = f"{self.song_name}.proj"
+        elif self.author_name:
+            default_filename = f"by{self.author_name}.proj"
+        else:
+            default_filename = "untitled.proj"
+
+        filename, _ = QFileDialog.getSaveFileName(self, "保存项目", default_filename, "项目文件 (*.proj)")
+        if filename:
+            try:
+                note_dicts = [note.to_dict() for note in self.draw_area.notes]
+                data = {
+                    'song_name': self.song_name,
+                    'author_name': self.author_name,
+                    'bpm': self.bpm,
+                    'notes': note_dicts
+                }
+                with open(filename, 'w', encoding='utf-8') as file:
+                    json.dump(data, file, ensure_ascii=False, indent=4)
+                self.statusBar().showMessage("项目已保存", 2000)
+            except Exception as e:
+                self.statusBar().showMessage(f"保存项目失败: {str(e)}", 5000)
+                QMessageBox.critical(self, "错误", f"无法保存项目: {str(e)}")
+    def save_asxml(self):
+        save_musicxml(self.draw_area.notes,self.bpm,self.song_name,self.author_name)
+        self.statusBar().showMessage("项目已保存为 XML", 2000)
 
     def open_xml(self):
         try:
             convert_notes_to_stream(self.draw_area.notes, self.bpm)
-            tmp_xml = auto_save_musicxml(self.draw_area.notes)
+            tmp_xml = auto_save_musicxml(self.draw_area.notes,self.bpm,self.song_name,self.author_name)
             from converters.mxl2opt import mxl2opt
             tmp_pdf = mxl2opt(tmp_xml)
 
@@ -181,6 +306,7 @@ class MainWindow(QMainWindow):
                 self.btn_pause.setEnabled(False)
                 self.btn_resume.setEnabled(False)
                 self.statusBar().showMessage("播放已停止", 2000)
+                self.draw_area.draw_vertical_line_at_x(None)  # 停止播放时移除竖线
                 return
 
             score_stream = convert_notes_to_stream(self.draw_area.notes, self.bpm)
@@ -194,7 +320,7 @@ class MainWindow(QMainWindow):
             self.btn_play.setText("停止播放")
             self.btn_pause.setEnabled(True)
             self.btn_resume.setEnabled(False)
-            self.timer.start(100)  # 每100毫秒更新一次时间
+            self.timer.start(10)  # 每10毫秒更新一次时间
             self.statusBar().showMessage("正在播放... 按播放键可停止", 2000)
 
         except Exception as e:
@@ -215,7 +341,7 @@ class MainWindow(QMainWindow):
             self.is_playing = True
             self.btn_pause.setEnabled(True)
             self.btn_resume.setEnabled(False)
-            self.timer.start(100)
+            self.timer.start(10)
             self.statusBar().showMessage("继续播放...", 2000)
 
     def update_play_time(self):
@@ -224,11 +350,43 @@ class MainWindow(QMainWindow):
             time_info = f"当前时间: {current_time:.2f} 秒"
             self.statusBar().showMessage(time_info)
 
+            # 根据BPM和当前时间计算竖线位置
+            beats_per_minute = self.bpm
+            seconds_per_beat = 60 / beats_per_minute
+            current_beat = current_time / seconds_per_beat
+            grid_size = self.draw_area.grid_size
+            pixels_per_beat = 8 * grid_size  # 8个格子为一拍
+            x_position = int(current_beat * pixels_per_beat)
+
+            # 绘制竖线
+            self.draw_area.draw_vertical_line_at_x(x_position)
+
+            if not pygame.mixer.music.get_busy():
+                self.is_playing = False
+                self.btn_play.setText("播放乐谱")
+                self.btn_pause.setEnabled(False)
+                self.btn_resume.setEnabled(False)
+                self.timer.stop()
+                self.statusBar().showMessage("播放已结束", 2000)
+                self.draw_area.draw_vertical_line_at_x(None)  # 播放结束时移除竖线
+
     def set_bpm(self):
         bpm, ok = QInputDialog.getInt(self, "设置BPM", "请输入BPM值:", self.bpm, 1, 300)
         if ok:
             self.bpm = bpm
             self.statusBar().showMessage(f"BPM已设置为: {bpm}", 3000)
+
+    def set_song_name(self):
+        song_name, ok = QInputDialog.getText(self, "修改乐曲名", "请输入新的乐曲名:", text=self.song_name)
+        if ok:
+            self.song_name = song_name
+            self.statusBar().showMessage(f"乐曲名已修改为: {song_name}", 3000)
+
+    def set_author_name(self):
+        author_name, ok = QInputDialog.getText(self, "修改作者名", "请输入新的作者名:", text=self.author_name)
+        if ok:
+            self.author_name = author_name
+            self.statusBar().showMessage(f"作者名已修改为: {author_name}", 3000)
 
     def closeEvent(self, event):
         if pygame.mixer.get_init():

@@ -1,0 +1,87 @@
+{
+    "song_name": "四季歌",
+    "author_name": "高俊翔",
+    "bpm": 120,
+    "notes": [
+        {
+            "left_x": 0,
+            "right_x": 160.0,
+            "y": 900,
+            "midi_value": 64,
+            "quarter_length": 1.0,
+            "timing": 0
+        },
+        {
+            "left_x": 160,
+            "right_x": 240.0,
+            "y": 900,
+            "midi_value": 64,
+            "quarter_length": 0.5,
+            "timing": 8
+        },
+        {
+            "left_x": 240,
+            "right_x": 320.0,
+            "y": 940,
+            "midi_value": 62,
+            "quarter_length": 0.5,
+            "timing": 12
+        },
+        {
+            "left_x": 320,
+            "right_x": 400.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 0.5,
+            "timing": 16
+        },
+        {
+            "left_x": 400,
+            "right_x": 480.0,
+            "y": 940,
+            "midi_value": 62,
+            "quarter_length": 0.5,
+            "timing": 20
+        },
+        {
+            "left_x": 480,
+            "right_x": 560.0,
+            "y": 980,
+            "midi_value": 60,
+            "quarter_length": 0.5,
+            "timing": 24
+        },
+        {
+            "left_x": 560,
+            "right_x": 640.0,
+            "y": 1000,
+            "midi_value": 59,
+            "quarter_length": 0.5,
+            "timing": 28
+        },
+        {
+            "left_x": 640,
+            "right_x": 800.0,
+            "y": 1040,
+            "midi_value": 57,
+            "quarter_length": 1.0,
+            "timing": 32
+        },
+        {
+            "left_x": 800,
+            "right_x": 960.0,
+            "y": 1040,
+            "midi_value": 57,
+            "quarter_length": 1.0,
+            "timing": 40
+        },
+        {
+            "left_x": 960,
+            "right_x": 1120.0,
+            "y": 1040,
+            "midi_value": 57,
+            "quarter_length": 1.0,
+            "timing": 48
+        }
+    ]
+}
