@@ -5,9 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3619994c-4b7e-47a1-b8bc-8bd1fe72a24f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Groupies.iml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/Groupies.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250514173005.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/merge.py" beforeDir="false" afterPath="$PROJECT_DIR$/module/merge.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/stream.py" beforeDir="false" afterPath="$PROJECT_DIR$/module/stream.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250527135247.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528164734.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528164734.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528164839.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528164839.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528165236.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528165236.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528165251.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528165251.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528165325.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp_works/tmp_20250528165325.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/works/多年以后_by高俊翔.proj" beforeDir="false" afterPath="$PROJECT_DIR$/works/多年以后_by高俊翔.proj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,26 +44,23 @@
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/59949/Documents/GitHub/PSP25-3/Groupies&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/59949/Desktop/PSP25-3/Groupies&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159" />
+        <option value="bundled-python-sdk-09665e90c3a7-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.15026.15" />
       </set>
     </attachedChunks>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="3619994c-4b7e-47a1-b8bc-8bd1fe72a24f" name="Changes" comment="" />
@@ -57,14 +68,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1747819944733</updated>
-      <workItem from="1747916965531" duration="1438000" />
-      <workItem from="1747918670050" duration="2978000" />
-      <workItem from="1748416008278" duration="3420000" />
     </task>
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -84,6 +89,6 @@
     <SUITE FILE_PATH="coverage/Groupies$test.coverage" NAME="test Coverage Results" MODIFIED="1742392091842" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Groupies$merge.coverage" NAME="merge Coverage Results" MODIFIED="1742399032299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$test.coverage" NAME="test Coverage Results" MODIFIED="1746610062120" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1748422037221" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\59949\Documents\GitHub\PSP25-3\Groupies" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1747819365875" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\59949\Documents\GitHub\PSP25-3\Groupies" />
   </component>
 </project>

@@ -1,10 +1,10 @@
-import yaml, subprocess
+import subprocess
 from pathlib import Path
-
 
 """生成一段随机的乐曲，mel单声部trio多声部"""
 def ran_midi(batch = 1, option = "mel"):
-    project_root = Path(config['BASIC_CONFIG']['PROJECT_ROOT'])
+    current_dir = Path(__file__).parent.resolve()
+    project_root = current_dir.parent
     model_name = ""
     config_name = ""
     if option == "trio":
@@ -16,10 +16,10 @@ def ran_midi(batch = 1, option = "mel"):
     command = [
         "music_vae_generate",
         "--config="+config_name,
-        "--checkpoint_file="+str(project_root/"pretrained_models"/"musicvae_checkpoint"/model_name),
+        "--checkpoint_file="+str(project_root/"models"/"musicvae_checkpoint"/model_name),
         "--mode=sample",
         "--num_outputs="+str(batch),
-        "--output_dir="+str(project_root/"assets"/"midi")
+        "--output_dir="+str(project_root/"works")
     ]
     result = subprocess.run(
         command,

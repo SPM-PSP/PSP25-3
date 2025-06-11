@@ -8,7 +8,7 @@
   <identification>
     <creator type="composer" />
     <encoding>
-      <encoding-date>2025-05-27</encoding-date>
+      <encoding-date>2025-06-10</encoding-date>
       <software>music21 v.9.5.0</software>
     </encoding>
   </identification>
@@ -19,12 +19,12 @@
     </scaling>
   </defaults>
   <part-list>
-    <score-part id="Pc884a50742199e83e7771a1d8c47028a">
+    <score-part id="Pad69ed1af5e8193eda100078c8e905a9">
       <part-name />
     </score-part>
   </part-list>
   <!--=========================== Part 1 ===========================-->
-  <part id="Pc884a50742199e83e7771a1d8c47028a">
+  <part id="Pad69ed1af5e8193eda100078c8e905a9">
     <!--========================= Measure 1 ==========================-->
     <measure implicit="no" number="1">
       <attributes>
@@ -47,38 +47,6 @@
         </direction-type>
         <sound tempo="120" />
       </direction>
-      <note print-object="no" print-spacing="yes">
-        <rest />
-        <duration>15120</duration>
-        <type>quarter</type>
-        <dot />
-      </note>
-      <note>
-        <pitch>
-          <step>C</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>10080</duration>
-        <tie type="start" />
-        <type>quarter</type>
-        <notations>
-          <tied type="start" />
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>C</step>
-          <alter>0</alter>
-          <octave>4</octave>
-        </pitch>
-        <duration>2520</duration>
-        <tie type="stop" />
-        <type>16th</type>
-        <notations>
-          <tied type="stop" />
-        </notations>
-      </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>
       </barline>

@@ -8,68 +8,54 @@ class SegmentStructure:
         self.segments.append((start, end, height))
 
     def compute_result(self):
-        # 收集所有点
-        points = set()
-        for seg in self.segments:
-            points.add(seg[0])
-            points.add(seg[1])
-        if not points:
-            return []
-        points = sorted(points)
-        n = len(points)
-        if n < 2:
-            return []
-        # 生成区间列表
-        intervals = [(points[i], points[i + 1]) for i in range(n - 1)]
-        m = len(intervals)
-        # 初始化高度集合
-        heights = [set() for _ in range(m)]
+        if not self.segments:
+            return [], []
 
-        # 处理每个线段
-        for seg in self.segments:
-            start, end, h = seg
-            # 计算i_min
-            pos_start = bisect.bisect_right(points, start)
-            i_min = pos_start - 1
-            if i_min < 0:
-                i_min = 0
-            # 计算i_max
-            pos_end = bisect.bisect_left(points, end)
-            i_max = pos_end - 1
-            # 确保i_max不超过区间的最大索引
-            if i_max >= m:
-                i_max = m - 1
-            # 遍历所有覆盖的区间
-            for i in range(i_min, i_max + 1):
-                heights[i].add(h)
+        # 生成事件点：(时间, 类型, 线段索引)
+        events = []
+        for idx, (start, end, _) in enumerate(self.segments):
+            events.append((start, 'start', idx))
+            events.append((end, 'end', idx))
 
-        # 生成结果
+        # 按时间排序事件点
+        events.sort(key=lambda x: (x[0], x[1]))
+
+        # 扫描线算法：维护当前活跃的线段
+        active_segments = {}  # {线段索引: (start, end, height)}
         result = []
-        rest=[]
-        for i in range(m):
-            s, e = intervals[i]
-            sorted_heights = sorted(heights[i])
-            if len(sorted_heights) > 0:
-                result.append((s, e, sorted_heights))
-            else:
-                rest.append((s, e))
-        return result, rest
+        rest = []
+        prev_time = None
 
+        for time, typ, idx in events:
+            if prev_time is not None and time != prev_time:
+                # 当前区间 [prev_time, time] 是否被至少一个线段完全覆盖？
+                has_coverage = any(
+                    seg_start <= prev_time and seg_end >= time
+                    for seg_start, seg_end, _ in active_segments.values()
+                )
+                if has_coverage:
+                    # 收集所有重叠线段的高度（去重后排序）
+                    heights = sorted({h for _, _, h in active_segments.values()})
+                    result.append((prev_time, time, heights))
+                else:
+                    rest.append((prev_time, time))
+
+            if typ == 'start':
+                active_segments[idx] = self.segments[idx]
+            else:
+                active_segments.pop(idx, None)
+            prev_time = time
+
+        return result, rest
 
 # 示例用法
 if __name__ == "__main__":
-    # 创建结构并添加线段
     structure = SegmentStructure()
-    structure.add_segment(20, 23, 4)
-    structure.add_segment(1, 3, 2)
-    structure.add_segment(2, 5, 3)
-    structure.add_segment(3, 7, 4)
-    structure.add_segment(4, 9, 5)
-    structure.add_segment(10,15,7)
+    structure.add_segment(1, 5, 2)   # 长线段A
+    structure.add_segment(2, 3, 3)   # 短线段B
+    structure.add_segment(4, 6, 4)   # 长线段C
 
-
-    # 计算结果
-    result, rest= structure.compute_result()
+    result, rest = structure.compute_result()
     for interval in result:
         print(f"Start: {interval[0]}, End: {interval[1]}, Heights: {interval[2]}")
     for seg in rest:

@@ -91,9 +91,9 @@ def auto_save_musicxml(notes, bpm, song_name="untitled", author_name="unnamed"):
     # 保存文件
     score_stream.write('musicxml', fp=filepath)
 
-    # 保留最近10个文件
+    # 保留最近20个文件
     files = sorted(os.listdir(save_dir), reverse=True)
-    for old_file in files[10:]:
+    for old_file in files[20:]:
         os.remove(os.path.join(save_dir, old_file))
 
     return filename
